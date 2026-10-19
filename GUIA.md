@@ -1,5 +1,19 @@
 # cultiva-e — guia de aprendizagem e implementação
 
+## Inspeção para início do módulo 2 — 19/10/2026
+
+Avaliação da árvore atual, posterior aos registros históricos abaixo. Módulo 2 iniciado pela inspeção; nenhuma atividade de implementação ou módulo declarado concluído.
+
+- Estrutura encontrada: `src/app/index.tsx`, `src/app/_layout.tsx` e `src/theme/theme.ts`. A entrada `index.js` registra diretamente a tela inicial; o layout com `Stack` ainda não participa desse fluxo.
+- O tema contém os tokens da paleta aprovada e o mapeamento para Paper, mas não é aplicado à tela. A tela exibe uma saudação e usa fundo branco fixo. A alteração em andamento nessa saudação foi preservada.
+- O manifesto declara Expo `~58.0.16`, React `19.3.0` e React Native `0.88.0`. Paper está ausente; Router aparece na instalação local como `extraneous`, fora do manifesto. Não considerar essa instalação reproduzível. Nome npm, nome visível e slug ainda estão como `meuprojeto`/`MeuProjeto`.
+- `tsconfig.json` estende a base Expo, mas não habilita `strict`. Não existe script `typecheck`. O arquivo de configuração ESLint existe, mas sua dependência `eslint-config-expo` está ausente.
+- Verificações com executáveis locais: `tsc --noEmit` falhou por falta de `react-native-paper`; ESLint falhou ao carregar `eslint-config-expo/flat`. `npm ls --depth=0` identificou diversos pacotes `extraneous`. Compilação e teste no celular não executados nesta inspeção.
+- Conceito apresentado: criar arquivos na pasta de rotas não ativa a navegação; tokens centralizados também precisam ser conectados à interface. Compreensão pelo responsável ainda a revisar.
+- Próximo exercício: atividade 2.1, ler `tokens` e `theme`, identificando cor principal, fundo, espaçamento e tipografia. Antes da atividade 2.2, regularizar em uma atividade própria as dependências e a configuração estrita, respeitando as autorizações registradas e consultando a documentação correspondente.
+
+Nenhuma dependência instalada nem código do aplicativo alterado nesta avaliação. Este diagnóstico prevalece sobre afirmações antigas de ausência de `src/` ou aprovação dos checks.
+
 Atualizado em 18/10/2026. Consulte [contex.md](contex.md) para regras do produto, [AGENTS.md](AGENTS.md) para o acordo de colaboração e [GUIA-VISUAL.MD](GUIA-VISUAL.MD) para a direção visual.
 
 ## Como usar esta trilha
