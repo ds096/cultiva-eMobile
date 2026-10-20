@@ -389,3 +389,11 @@ O tema foi validado pelo responsável. O módulo 0 foi declarado concluído pelo
 Depois de cada atividade, registrar: identificador, data, objetivo, o que você implementou, conceitos compreendidos, verificações executadas, bloqueios e próximo exercício. Atualizar também o contexto se houver decisão de produto aprovada.
 
 **Diagnóstico atualizado nesta entrega:** somente o tema está presente sob `src/`; o typecheck falha pela ausência de `react-native-paper`. O lint está bloqueado por falta de preparação e não foi executado para evitar instalação automática. O diagnóstico inicial e a mudança observada na árvore de arquivos estão em [contex.md](contex.md). A resolução será feita em atividades acordadas; não instalar dependências nem alterar o tema para encobrir esses problemas.
+
+### Persistencia do CMake no Windows — 20/10/2026
+
+A pedido do responsavel, configuracao CMake 4.1.2 persistida com plugin Expo local para o app e patch-package para Reanimated 4.7.1. Mantido o diretorio cultiva-ev2. Adicionado script typecheck para executar o TypeScript ja instalado. Detalhes e comandos em CMAKE-WINDOWS.md.
+
+Conceito: android/ e node_modules/ sao gerados; a fonte permanente da configuracao fica no plugin e no patch versionaveis. Verificacoes aprovadas: plugin sem duplicacao, Prebuild regenerado e repetido, patch no arquivo original, postinstall local duas vezes, lint, tipos e compatibilidade Expo. Build Debug arm64 passou em 5m 9s. Teste em aparelho, release e outras arquiteturas nao executados. npm ci completo nao executado; testada a restauracao do arquivo original da dependencia. Alertas de depreciacao e auditoria registrados no documento tecnico.
+
+Proximo exercicio: identificar por que reinstalar dependencias remove edicoes manuais e como postinstall reaplica o patch; depois executar o aplicativo no celular para conferir a experiencia. Nenhum modulo funcional declarado concluido.

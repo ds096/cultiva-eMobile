@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native-reanimated/android/build.gradle.kts b/node_modules/react-native-reanimated/android/build.gradle.kts
+--- a/node_modules/react-native-reanimated/android/build.gradle.kts
++++ b/node_modules/react-native-reanimated/android/build.gradle.kts
+@@ -225,6 +225,8 @@ android {
+     externalNativeBuild {
+         cmake {
+             path = file("CMakeLists.txt")
++            // Keep the CMake version validated for long Windows paths.
++            version = "4.1.2"
+         }
+     }
+ 
