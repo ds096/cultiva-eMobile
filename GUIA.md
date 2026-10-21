@@ -1,21 +1,5 @@
 # cultiva-e — guia de aprendizagem e implementação
 
-## Inspeção para início do módulo 2 — 19/10/2026
-
-Avaliação da árvore atual, posterior aos registros históricos abaixo. Módulo 2 iniciado pela inspeção; nenhuma atividade de implementação ou módulo declarado concluído.
-
-- Estrutura encontrada: `src/app/index.tsx`, `src/app/_layout.tsx` e `src/theme/theme.ts`. A entrada `index.js` registra diretamente a tela inicial; o layout com `Stack` ainda não participa desse fluxo.
-- O tema contém os tokens da paleta aprovada e o mapeamento para Paper, mas não é aplicado à tela. A tela exibe uma saudação e usa fundo branco fixo. A alteração em andamento nessa saudação foi preservada.
-- O manifesto declara Expo `~58.0.16`, React `19.3.0` e React Native `0.88.0`. Paper está ausente; Router aparece na instalação local como `extraneous`, fora do manifesto. Não considerar essa instalação reproduzível. Nome npm, nome visível e slug ainda estão como `meuprojeto`/`MeuProjeto`.
-- `tsconfig.json` estende a base Expo, mas não habilita `strict`. Não existe script `typecheck`. O arquivo de configuração ESLint existe, mas sua dependência `eslint-config-expo` está ausente.
-- Verificações com executáveis locais: `tsc --noEmit` falhou por falta de `react-native-paper`; ESLint falhou ao carregar `eslint-config-expo/flat`. `npm ls --depth=0` identificou diversos pacotes `extraneous`. Compilação e teste no celular não executados nesta inspeção.
-- Conceito apresentado: criar arquivos na pasta de rotas não ativa a navegação; tokens centralizados também precisam ser conectados à interface. Compreensão pelo responsável ainda a revisar.
-- Próximo exercício: atividade 2.1, ler `tokens` e `theme`, identificando cor principal, fundo, espaçamento e tipografia. Antes da atividade 2.2, regularizar em uma atividade própria as dependências e a configuração estrita, respeitando as autorizações registradas e consultando a documentação correspondente.
-
-Nenhuma dependência instalada nem código do aplicativo alterado nesta avaliação. Este diagnóstico prevalece sobre afirmações antigas de ausência de `src/` ou aprovação dos checks.
-
-Atualizado em 18/10/2026. Consulte [contex.md](contex.md) para regras do produto, [AGENTS.md](AGENTS.md) para o acordo de colaboração e [GUIA-VISUAL.MD](GUIA-VISUAL.MD) para a direção visual.
-
 ## Como usar esta trilha
 
 Você escreve o código; o agente explica, propõe uma atividade pequena e revisa seu resultado. Peça implementação pelo agente somente quando desejar essa ajuda. Todo código novo ou alterado, inclusive exemplos, deve ter comentários explicativos. Nenhuma biblioteca será instalada sem sua autorização.
@@ -36,22 +20,22 @@ Um módulo agrupa várias atividades; não é uma tarefa para executar de uma ve
 
 **Base já validada pelo responsável:** `src/theme/theme.ts`. Essa validação não conclui o módulo de interface nem garante compilação do aplicativo.
 
-| Módulo | Resultado principal | Estado |
-| --- | --- | --- |
-| 0. Produto e diagnóstico | Entender o produto e a situação real do projeto | Concluído pelo responsável em 18/10/2026 |
-| 1. Fundamentos e estrutura | Compreender responsabilidades e fluxo de dados | Pendente |
-| 2. Base visual e navegação | Preparar componentes e caminhos entre telas | Pendente |
-| 3. Acesso por perfil local | Selecionar e restaurar um perfil local | Pendente |
-| 4. Persistência e talhões | Manter cadastros e revisões no dispositivo | Pendente |
-| 5. Planos de manejo | Criar modelos próprios de atividades | Pendente |
-| 6. Atividades dos talhões | Importar cópias e organizar o planejamento | Pendente |
-| 7. Insumos e cálculos | Cadastrar aquisições e definir cálculos confiáveis | Pendente |
-| 8. Lançamento único | Registrar execução uma única vez, sem edição posterior | Pendente |
-| 9. Fotos e histórico | Preservar fotos e consultar o que foi realizado | Pendente |
-| 10. Calendário e lembretes | Consultar a agenda e receber notificações locais | Pendente |
-| 11. Backend e autenticação | Identificar o produtor e proteger seus dados remotos | Pendente |
-| 12. Sincronização | Enviar e reconciliar dados e fotos com segurança | Pendente |
-| 13. Qualidade e distribuição | Validar e distribuir a versão Android | Pendente |
+| Módulo                       | Resultado principal                                    | Estado                                   |
+| ---------------------------- | ------------------------------------------------------ | ---------------------------------------- |
+| 0. Produto e diagnóstico     | Entender o produto e a situação real do projeto        | Concluído pelo responsável em 18/10/2026 |
+| 1. Fundamentos e estrutura   | Compreender responsabilidades e fluxo de dados         | Pendente                                 |
+| 2. Base visual e navegação   | Preparar componentes e caminhos entre telas            | Pendente                                 |
+| 3. Acesso por perfil local   | Selecionar e restaurar um perfil local                 | Pendente                                 |
+| 4. Persistência e talhões    | Manter cadastros e revisões no dispositivo             | Pendente                                 |
+| 5. Planos de manejo          | Criar modelos próprios de atividades                   | Pendente                                 |
+| 6. Atividades dos talhões    | Importar cópias e organizar o planejamento             | Pendente                                 |
+| 7. Insumos e cálculos        | Cadastrar aquisições e definir cálculos confiáveis     | Pendente                                 |
+| 8. Lançamento único          | Registrar execução uma única vez, sem edição posterior | Pendente                                 |
+| 9. Fotos e histórico         | Preservar fotos e consultar o que foi realizado        | Pendente                                 |
+| 10. Calendário e lembretes   | Consultar a agenda e receber notificações locais       | Pendente                                 |
+| 11. Backend e autenticação   | Identificar o produtor e proteger seus dados remotos   | Pendente                                 |
+| 12. Sincronização            | Enviar e reconciliar dados e fotos com segurança       | Pendente                                 |
+| 13. Qualidade e distribuição | Validar e distribuir a versão Android                  | Pendente                                 |
 
 As tecnologias já aprovadas não precisam ser escolhidas novamente. Decisões detalhadas pendentes devem ser resolvidas antes da atividade que depende delas. A arquitetura crescerá com necessidades concretas, sem construir todas as camadas antecipadamente.
 
@@ -130,17 +114,17 @@ As tecnologias já aprovadas não precisam ser escolhidas novamente. Decisões d
 
 ### O que a tela deve conter
 
-| Elemento | Comportamento esperado |
-| --- | --- |
-| Identidade | Nome cultiva-e e apresentação conforme tema; tratar a logo ausente antes de referenciá-la. |
-| Explicação | Informar claramente que é um perfil salvo no dispositivo, sem senha e sem autenticação remota. |
-| Campo de e-mail | Rótulo visível, teclado apropriado, digitação acessível e regras de normalização acordadas. |
-| Validação | Identificar campo vazio ou formato inválido e explicar como corrigir; não afirmar que o e-mail foi comprovado. |
-| Ação principal | Botão “Continuar”, com prevenção de submissão repetida durante o processamento. |
-| Carregamento | Indicar que o perfil está sendo aberto; não deixar a tela parecer travada. |
-| Erros | Informar falha de leitura ou gravação e permitir nova tentativa, preservando o valor digitado. |
-| Teclado e acessibilidade | Campo e botão alcançáveis com teclado aberto, rótulos acessíveis e suporte à ampliação de fonte. |
-| Destino | Depois de abrir o perfil, encaminhar à área de talhões; na primeira utilização, apresentar estado vazio. |
+| Elemento                 | Comportamento esperado                                                                                         |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| Identidade               | Nome cultiva-e e apresentação conforme tema; tratar a logo ausente antes de referenciá-la.                     |
+| Explicação               | Informar claramente que é um perfil salvo no dispositivo, sem senha e sem autenticação remota.                 |
+| Campo de e-mail          | Rótulo visível, teclado apropriado, digitação acessível e regras de normalização acordadas.                    |
+| Validação                | Identificar campo vazio ou formato inválido e explicar como corrigir; não afirmar que o e-mail foi comprovado. |
+| Ação principal           | Botão “Continuar”, com prevenção de submissão repetida durante o processamento.                                |
+| Carregamento             | Indicar que o perfil está sendo aberto; não deixar a tela parecer travada.                                     |
+| Erros                    | Informar falha de leitura ou gravação e permitir nova tentativa, preservando o valor digitado.                 |
+| Teclado e acessibilidade | Campo e botão alcançáveis com teclado aberto, rótulos acessíveis e suporte à ampliação de fonte.               |
+| Destino                  | Depois de abrir o perfil, encaminhar à área de talhões; na primeira utilização, apresentar estado vazio.       |
 
 Não incluir senha, confirmação de e-mail ou recuperação de senha nesta etapa. Um formulário de login real virá com o contrato de autenticação do módulo 11.
 
@@ -381,10 +365,10 @@ Verificações: lint e typecheck passaram; versões conferidas pelo Expo; árvor
 
 O tema foi validado pelo responsável. O módulo 0 foi declarado concluído pelo responsável em 18/10/2026; os demais módulos continuam pendentes. Os bloqueios técnicos permanecem abertos, conforme [contex.md](contex.md). A conclusão do diagnóstico não comprova funcionamento do aplicativo.
 
-| Atividade | Estado | Evidência ou próximo passo |
-| --- | --- | --- |
+| Atividade                 | Estado                                   | Evidência ou próximo passo                                                                                                                                               |
+| ------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 0 — Produto e diagnóstico | Concluído pelo responsável em 18/10/2026 | Confirmada a seleção de perfil por e-mail na primeira versão, sem novas decisões de produto. Bloqueios de preparação ainda não resolvidos; `src/` contém somente o tema. |
-| 1.1 — Ler TypeScript | Pendente | Explicar tipos de entrada e saída, valores opcionais e erros; manter `strict` habilitado. |
+| 1.1 — Ler TypeScript      | Pendente                                 | Explicar tipos de entrada e saída, valores opcionais e erros; manter `strict` habilitado.                                                                                |
 
 Depois de cada atividade, registrar: identificador, data, objetivo, o que você implementou, conceitos compreendidos, verificações executadas, bloqueios e próximo exercício. Atualizar também o contexto se houver decisão de produto aprovada.
 
