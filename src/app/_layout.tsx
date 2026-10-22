@@ -6,8 +6,22 @@ export default function Layout() {
   return (
     // Compartilha o tema com todas as telas.
     <PaperProvider theme={theme}>
-      {/* Gerencia as rotas do aplicativo. */}
-      <Stack />
+      <Stack>
+        <Stack.Screen
+          name="index"
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="plots"
+          options={{
+            title: "Meus Talhões",
+            headerBackVisible: false,
+          }}
+        />
+      </Stack>
     </PaperProvider>
   );
 }

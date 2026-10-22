@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { router } from "expo-router";
+import { perfilRepository } from "../repositories/perfilRepository";
 import {
   View,
   Text,
@@ -16,6 +17,14 @@ export default function Acesso() {
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
 
+  useEffect(() => {
+    const emailSalvo = perfilRepository.get();
+
+    if (emailSalvo) {
+      router.replace("/talhoes");
+    }
+  }, []);
+
   async function handleContinuar() {
     const emailNormalizado = normalizarEmail(email);
 
@@ -28,15 +37,11 @@ export default function Acesso() {
     setCarregando(true);
 
     try {
-      // Simulação temporária de operação assíncrona.
-      await new Promise<void>((resolve) => setTimeout(resolve, 500));
+      perfilRepository.save(emailNormalizado);
 
-      console.log("E-mail válido:", emailNormalizado);
-      router.push("/plots");
-
-      // Na próxima aula, salvaremos o perfil localmente.
+      router.replace("/plots");
     } catch {
-      setErro("Não foi possível continuar.");
+      setErro("Não foi possível salvar o perfil.");
     } finally {
       setCarregando(false);
     }
