@@ -8,7 +8,7 @@ export default function Plots() {
     // Tela temporária para estudar navegação.
     <View style={{ flex: 1, padding: 24 }}>
       <Text variant="headlineSmall">Meus talhões</Text>
-      <AppButton title="Talhoes" onPress={() => router.push("/")} />
+      <AppButton title="Login" onPress={() => router.push("/")} />
     </View>
   );
 }
