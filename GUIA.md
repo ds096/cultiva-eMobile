@@ -1,4 +1,4 @@
-# cultiva-e — guia de aprendizagem e implementação
+# cultiva-eV2 — guia de aprendizagem e implementação
 
 ## Como usar esta trilha
 
@@ -23,9 +23,9 @@ Um módulo agrupa várias atividades; não é uma tarefa para executar de uma ve
 | Módulo                       | Resultado principal                                    | Estado                                   |
 | ---------------------------- | ------------------------------------------------------ | ---------------------------------------- |
 | 0. Produto e diagnóstico     | Entender o produto e a situação real do projeto        | Concluído pelo responsável em 18/10/2026 |
-| 1. Fundamentos e estrutura   | Compreender responsabilidades e fluxo de dados         | Pendente                                 |
-| 2. Base visual e navegação   | Preparar componentes e caminhos entre telas            | Pendente                                 |
-| 3. Acesso por perfil local   | Selecionar e restaurar um perfil local                 | Pendente                                 |
+| 1. Fundamentos e estrutura   | Compreender responsabilidades e fluxo de dados         | Concluído pelo responsável; confirmado em 23/10/2026 |
+| 2. Base visual e navegação   | Preparar componentes e caminhos entre telas            | Concluído pelo responsável; confirmado em 23/10/2026 |
+| 3. Acesso por perfil local   | Selecionar e restaurar um perfil local                 | 3.1 a 3.4 concluídas; 3.5 em andamento; 3.6 pendente |
 | 4. Persistência e talhões    | Manter cadastros e revisões no dispositivo             | Pendente                                 |
 | 5. Planos de manejo          | Criar modelos próprios de atividades                   | Pendente                                 |
 | 6. Atividades dos talhões    | Importar cópias e organizar o planejamento             | Pendente                                 |
@@ -38,6 +38,41 @@ Um módulo agrupa várias atividades; não é uma tarefa para executar de uma ve
 | 13. Qualidade e distribuição | Validar e distribuir a versão Android                  | Pendente                                 |
 
 As tecnologias já aprovadas não precisam ser escolhidas novamente. Decisões detalhadas pendentes devem ser resolvidas antes da atividade que depende delas. A arquitetura crescerá com necessidades concretas, sem construir todas as camadas antecipadamente.
+
+**Atualização de 23/10/2026:** o responsável confirmou a conclusão do módulo 2 e das etapas anteriores à 3.5, que está em andamento. Esse progresso de aprendizagem não elimina os problemas encontrados na inspeção atual. Os diagnósticos datados ao final deste guia são históricos; a estrutura atual está descrita abaixo.
+
+## Estrutura e fluxo de dados atuais — 23/10/2026
+
+| Arquivo em `src/` | Responsabilidade atual |
+| --- | --- |
+| `app/_layout.tsx` | Monta `ProfileProvider` e `Navigation`, que consulta o perfil para configurar as rotas. |
+| `app/index.tsx` | Tela `Access`: entrada de e-mail, validação, gravação e solicitação de navegação. |
+| `app/plots.tsx` | Tela temporária `Plots`, com título e ação de saída; ainda não cadastra talhões. |
+| `components/AppButton.tsx` | Botão compartilhado baseado no Paper, com propriedades de carregamento e desabilitação. |
+| `context/PerfilContext.tsx` | Estado compartilhado do e-mail, `ProfileProvider`, `useProfile`, `selectProfile` e `clearProfile`. |
+| `repositories/perfilRepository.ts` | Encapsula leitura, gravação e remoção da seleção no MMKV. |
+| `utilities/email.ts` | `normalizeEmail` remove espaços externos e converte para minúsculas; `validateEmail` verifica formato básico. |
+| `theme/theme.ts` | Centraliza tokens e configuração visual do Paper. |
+
+A entrada ativa declarada no `package.json` é `expo-router/entry`. O `index.js` da raiz permanece no projeto, mas não é a entrada declarada. MMKV e Nitro Modules já constam nas dependências, ao contrário do estado registrado após o reinício de 19/10. Nesta atividade não houve instalação ou comprovação de funcionamento nativo em aparelho.
+
+**Contrato persistido atual:** a instância MMKV usa o identificador `cultiva-e-perfil`; a chave `perfil.email` guarda uma única string de e-mail selecionado. `save(email)` grava, `get()` declara retorno `string | undefined | null` e `remove()` apaga essa seleção. Ainda não há entidades, listas ou revisões de talhões, planos, atividades e lançamentos. A seleção local não comprova identidade nem fornece autorização remota.
+
+**Memória e disco:** o contexto inicializa seu estado lendo o repositório; suas operações atualizam disco e estado React. Entretanto, as telas ainda chamam o repositório diretamente, sem chamar essas operações. Portanto, salvar ou remover a seleção pela tela não atualiza automaticamente o e-mail observado pela navegação. O fluxo a consolidar na etapa 3.5 é tela → contexto → repositório → MMKV, com o contexto refletindo a seleção em memória para a navegação.
+
+**Nomes das funções:** identificadores de funções e componentes em inglês; textos da interface e comentários em português. Nesta atualização: `Acesso` → `Access`, `Navegacao` → `Navigation`, `PerfilProvider` → `ProfileProvider`, `usePerfil` → `useProfile`, `entrar` → `selectProfile`, `sair` → `clearProfile`, `handleContinuar` → `handleContinue`, `handleSair` → `handleExit`, `normalizarEmail` → `normalizeEmail` e `validarEmail` → `validateEmail`. Arquivos, tipos, variáveis e chaves persistidas não foram renomeados; mudar uma chave persistida exigiria tratar os dados existentes.
+
+**Avaliação estrutural, sem correções nesta atividade:**
+
+- A separação entre rotas, componentes, contexto, repositório, utilitários e tema é adequada ao tamanho atual. Não há necessidade imediata de criar novas camadas.
+- O layout declara a rota `talhoes`, mas o arquivo existente é `plots.tsx`. A regra de disponibilidade pretendida não está associada à tela real.
+- O acesso e a saída modificam diretamente o repositório, deixando o contexto desatualizado. Resolver essa integração durante a etapa 3.5; a saída completa pertence à 3.6.
+- A leitura inicial do MMKV no contexto e na tela não trata falhas. Definir recuperação e mensagem de erro antes de concluir a restauração.
+- O contexto promete `email: string | null`, mas o estado também admite `undefined`: há erro de tipos a resolver definindo um contrato único para ausência de seleção.
+- `PaperProvider` e `theme` estão importados no layout, mas não são usados. A tela de acesso repete cores e medidas fora dos tokens, usa botão próprio e ainda não explica a limitação do perfil local.
+- Teclado, áreas seguras, fonte ampliada e TalkBack precisam de validação em aparelho; a inspeção não comprova esses critérios. O botão compartilhado ainda não aplica explicitamente as medidas mínimas do guia.
+
+Referências consultadas: [Expo SDK 58](https://docs.expo.dev/versions/v58.0.0/) e [rotas protegidas do Expo Router](https://docs.expo.dev/router/advanced/protected/). As restrições de navegação são locais e não equivalem a autorização em servidor.
 
 ## Módulo 0 — Produto e diagnóstico
 
@@ -83,6 +118,8 @@ As tecnologias já aprovadas não precisam ser escolhidas novamente. Decisões d
 
 ## Módulo 2 — Base visual e navegação
 
+**Estado:** concluído pelo responsável, confirmado em 23/10/2026. Pendências técnicas observadas na árvore atual estão registradas na avaliação acima.
+
 **Objetivo:** aplicar o tema existente e preparar uma interface consistente.
 
 **Funcionalidades:** estrutura de tela, campo, botão, mensagem de erro e navegação inicial.
@@ -103,6 +140,8 @@ As tecnologias já aprovadas não precisam ser escolhidas novamente. Decisões d
 **Perguntas de revisão:** qual diferença entre token e cor fixa na tela? O que um provedor compartilha? Por que todas as telas não devem conter seus próprios botões diferentes?
 
 ## Módulo 3 — Acesso por perfil local
+
+**Estado em 23/10/2026:** atividades 3.1, 3.2, 3.3 e 3.4 concluídas pelo responsável; 3.5 em andamento; 3.6 pendente.
 
 **Objetivo:** construir a primeira tela da jornada e compreender seus limites.
 
@@ -354,6 +393,16 @@ Não incluir senha, confirmação de e-mail ou recuperação de senha nesta etap
 **Perguntas de revisão:** quais falhas causariam perda de confiança ou dados? O que foi testado em aparelho e o que só foi inspecionado? Como uma atualização preserva registros ainda não enviados?
 
 ## Registro das próximas atividades
+
+### Atualização do progresso, nomes e avaliação — 23/10/2026
+
+Atividade: registrar os módulos anteriores à etapa 3.5 como concluídos pelo responsável, documentar a estrutura existente e renomear funções para inglês com comentários explicativos. Aprendizado: o repositório persiste dados, enquanto o contexto mantém o estado observado pela interface; modificar o primeiro não atualiza automaticamente o segundo.
+
+Verificações antes e depois da renomeação: `npm run lint` terminou sem erros e com dois avisos preexistentes, por `PaperProvider` e `theme` não utilizados. `npm run typecheck` falhou nas duas execuções pelo mesmo contrato incompatível de `email` em `src/context/PerfilContext.tsx` (`undefined` não aceito pelo contexto). Nenhuma correção estrutural ou instalação foi realizada. Não houve teste em aparelho.
+
+Próximo exercício: continuar a etapa 3.5, alinhando a rota `plots` ao layout e fazendo as telas consumirem as operações do contexto. Resolver o contrato de ausência de perfil e o tratamento de falha de leitura, depois verificar entrada e restauração após reiniciar. A etapa 3.6 e os módulos seguintes permanecem pendentes.
+
+**Histórico abaixo:** os registros de 18 a 20/10 descrevem a árvore e as verificações daquelas datas; não substituem o estado atual descrito acima.
 
 ### Preparação após o reinício — 19/10/2026
 

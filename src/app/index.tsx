@@ -10,9 +10,10 @@ import {
   StyleSheet,
 } from "react-native";
 
-import { normalizarEmail, validarEmail } from "../utilities/email";
+import { normalizeEmail, validateEmail } from "../utilities/email";
 
-export default function Acesso() {
+// Apresenta o formulário de seleção do perfil neste dispositivo.
+export default function Access() {
   const [email, setEmail] = useState("");
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
@@ -25,10 +26,11 @@ export default function Acesso() {
     }
   }, []);
 
-  async function handleContinuar() {
-    const emailNormalizado = normalizarEmail(email);
+  // Valida e salva a seleção antes de solicitar a navegação.
+  async function handleContinue() {
+    const emailNormalizado = normalizeEmail(email);
 
-    if (!validarEmail(emailNormalizado)) {
+    if (!validateEmail(emailNormalizado)) {
       setErro("Informe um e-mail válido.");
       return;
     }
@@ -71,7 +73,7 @@ export default function Acesso() {
 
       <Pressable
         style={styles.botao}
-        onPress={handleContinuar}
+        onPress={handleContinue}
         disabled={carregando}
       >
         {carregando ? (

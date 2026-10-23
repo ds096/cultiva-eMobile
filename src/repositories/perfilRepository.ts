@@ -11,7 +11,7 @@ export const perfilRepository = {
     storage.set(PERFIL_KEY, email);
   },
 
-  get(): string | undefined {
+  get(): string | undefined | null {
     return storage.getString(PERFIL_KEY);
   },
 
