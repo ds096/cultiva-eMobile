@@ -21,7 +21,7 @@ export default function Acesso() {
     const emailSalvo = perfilRepository.get();
 
     if (emailSalvo) {
-      router.replace("/talhoes");
+      router.replace("/plots");
     }
   }, []);
 
