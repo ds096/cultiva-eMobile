@@ -14,7 +14,8 @@ function Navigation() {
       </Stack.Protected>
 
       <Stack.Protected guard={!!email}>
-        <Stack.Screen name="talhoes" options={{ title: "Meus Talhões" }} />
+        {/* O nome da rota corresponde ao arquivo plots.tsx. */}
+        <Stack.Screen name="plots" options={{ title: "Meus Talhões" }} />
       </Stack.Protected>
     </Stack>
   );
@@ -22,8 +23,11 @@ function Navigation() {
 
 export default function Layout() {
   return (
-    <ProfileProvider>
-      <Navigation />
-    </ProfileProvider>
+    // Disponibiliza o tema personalizado aos componentes Paper descendentes.
+    <PaperProvider theme={theme}>
+      <ProfileProvider>
+        <Navigation />
+      </ProfileProvider>
+    </PaperProvider>
   );
 }

@@ -45,7 +45,7 @@ As tecnologias já aprovadas não precisam ser escolhidas novamente. Decisões d
 
 | Arquivo em `src/` | Responsabilidade atual |
 | --- | --- |
-| `app/_layout.tsx` | Monta `ProfileProvider` e `Navigation`, que consulta o perfil para configurar as rotas. |
+| `app/_layout.tsx` | Aplica o tema com `PaperProvider` e monta `ProfileProvider` e `Navigation`, com as rotas `index` e `plots`. |
 | `app/index.tsx` | Tela `Access`: entrada de e-mail, validação, gravação e solicitação de navegação. |
 | `app/plots.tsx` | Tela temporária `Plots`, com título e ação de saída; ainda não cadastra talhões. |
 | `components/AppButton.tsx` | Botão compartilhado baseado no Paper, com propriedades de carregamento e desabilitação. |
@@ -62,14 +62,14 @@ A entrada ativa declarada no `package.json` é `expo-router/entry`. O `index.js`
 
 **Nomes das funções:** identificadores de funções e componentes em inglês; textos da interface e comentários em português. Nesta atualização: `Acesso` → `Access`, `Navegacao` → `Navigation`, `PerfilProvider` → `ProfileProvider`, `usePerfil` → `useProfile`, `entrar` → `selectProfile`, `sair` → `clearProfile`, `handleContinuar` → `handleContinue`, `handleSair` → `handleExit`, `normalizarEmail` → `normalizeEmail` e `validarEmail` → `validateEmail`. Arquivos, tipos, variáveis e chaves persistidas não foram renomeados; mudar uma chave persistida exigiria tratar os dados existentes.
 
-**Avaliação estrutural, sem correções nesta atividade:**
+**Avaliação estrutural e atualização dos ajustes em 23/10/2026:**
 
 - A separação entre rotas, componentes, contexto, repositório, utilitários e tema é adequada ao tamanho atual. Não há necessidade imediata de criar novas camadas.
-- O layout declara a rota `talhoes`, mas o arquivo existente é `plots.tsx`. A regra de disponibilidade pretendida não está associada à tela real.
+- Corrigido: o layout agora declara `plots`, correspondendo ao arquivo `plots.tsx`, e mantém o título “Meus Talhões”.
 - O acesso e a saída modificam diretamente o repositório, deixando o contexto desatualizado. Resolver essa integração durante a etapa 3.5; a saída completa pertence à 3.6.
 - A leitura inicial do MMKV no contexto e na tela não trata falhas. Definir recuperação e mensagem de erro antes de concluir a restauração.
 - O contexto promete `email: string | null`, mas o estado também admite `undefined`: há erro de tipos a resolver definindo um contrato único para ausência de seleção.
-- `PaperProvider` e `theme` estão importados no layout, mas não são usados. A tela de acesso repete cores e medidas fora dos tokens, usa botão próprio e ainda não explica a limitação do perfil local.
+- Corrigido: `PaperProvider` envolve o provedor de perfil e a navegação, recebendo `theme`. Isso aplica o tema aos componentes Paper; a tela de acesso ainda usa componentes nativos com cores e medidas próprias e não explica a limitação do perfil local.
 - Teclado, áreas seguras, fonte ampliada e TalkBack precisam de validação em aparelho; a inspeção não comprova esses critérios. O botão compartilhado ainda não aplica explicitamente as medidas mínimas do guia.
 
 Referências consultadas: [Expo SDK 58](https://docs.expo.dev/versions/v58.0.0/) e [rotas protegidas do Expo Router](https://docs.expo.dev/router/advanced/protected/). As restrições de navegação são locais e não equivalem a autorização em servidor.
@@ -175,6 +175,16 @@ Não incluir senha, confirmação de e-mail ou recuperação de senha nesta etap
 4. **3.4 — Persistir a seleção:** criar o contrato mínimo de perfil e sua implementação local, sem alegar conexão com servidor.
 5. **3.5 — Navegar e restaurar:** abrir a área interna após sucesso e restaurar a seleção ao reiniciar, tratando erro de leitura.
 6. **3.6 — Sair:** encerrar a seleção sem apagar registros; conferir a separação entre perfis locais sem apresentá-la como segurança remota.
+
+### Pendências obrigatórias da etapa 3.5
+
+Tratar os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) em pequenas atividades. Ainda não foram implementados:
+
+- **2 — Integrar telas e contexto:** usar `selectProfile` no acesso e `clearProfile` na saída, via `useProfile`, em vez de modificar o repositório diretamente. Manter tratamento de erros e centralizar a decisão de navegação no layout. A integração da saída entra neste ajuste; a verificação completa de preservação dos registros e separação dos perfis continua na etapa 3.6.
+- **3 — Tratar restauração:** centralizar a leitura no contexto, remover a leitura duplicada da tela e tratar falhas de leitura e inicialização do MMKV. Exibir erro com “Tentar novamente”, sem apagar dados ou confundir falha com ausência de perfil.
+- **5 — Unificar o contrato:** usar `string | null` no estado e no retorno do repositório, convertendo resultado ausente para `null` após leitura bem-sucedida. Manter erro de leitura como estado separado; resolver o erro de TypeScript sem ocultá-lo com coerções.
+
+**Verificação da etapa 3.5:** conferir entrada com atualização imediata do contexto, restauração após reiniciar, ausência de seleção e recuperação de falha de leitura; executar lint e typecheck. Os ajustes 1 (rota) e 4 (provedor de tema) já foram aplicados, mas não concluem esta etapa. Enquanto o ponto 2 estiver pendente, a entrada pode continuar sem abrir `plots`, pois o contexto ainda não reflete a seleção salva.
 
 **Critérios de conclusão:** testar entrada vazia e inválida, variações normalizáveis acordadas, duplo toque, falha de armazenamento, reinício e saída. Nenhuma mensagem promete autenticação ou sincronização. O destino inicial pode ser uma tela vazia real, sem cadastros fictícios.
 
@@ -393,6 +403,12 @@ Não incluir senha, confirmação de e-mail ou recuperação de senha nesta etap
 **Perguntas de revisão:** quais falhas causariam perda de confiança ou dados? O que foi testado em aparelho e o que só foi inspecionado? Como uma atualização preserva registros ainda não enviados?
 
 ## Registro das próximas atividades
+
+### Aplicação dos ajustes 1 e 4 da revisão — 23/10/2026
+
+Aplicado em `src/app/_layout.tsx`: rota `plots` no lugar de `talhoes` e `PaperProvider` recebendo o tema existente. Aprendizado: o nome da rota acompanha o arquivo, enquanto o título permanece em português; o provedor compartilha o tema com os componentes Paper descendentes.
+
+Verificações: lint passou sem avisos; typecheck continua falhando pelo contrato de `email` no contexto, pendência do ponto 5. `git diff --check` não encontrou problemas de espaços. Não houve teste em aparelho. Os pontos 2, 3 e 5 foram incluídos explicitamente na etapa 3.5, sem alterações na implementação. Próximo exercício: unificar o contrato de ausência do perfil e seguir as pendências dessa etapa; o módulo 3 permanece em andamento.
 
 ### Atualização do progresso, nomes e avaliação — 23/10/2026
 
