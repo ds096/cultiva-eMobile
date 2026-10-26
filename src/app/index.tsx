@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
-import { router } from "expo-router";
-import { perfilRepository } from "../repositories/perfilRepository";
+import { useState } from "react";
+import { useProfile } from "../context/PerfilContext";
 import {
   View,
   Text,
@@ -14,23 +13,18 @@ import { normalizeEmail, validateEmail } from "../utilities/email";
 
 // Apresenta o formulário de seleção do perfil neste dispositivo.
 export default function Access() {
+  const { selectProfile } = useProfile();
+
   const [email, setEmail] = useState("");
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
 
-  useEffect(() => {
-    const emailSalvo = perfilRepository.get();
-
-    if (emailSalvo) {
-      router.replace("/plots");
-    }
-  }, []);
-
   // Valida e salva a seleção antes de solicitar a navegação.
-  async function handleContinue() {
-    const emailNormalizado = normalizeEmail(email);
+  function handleContinue() {
+    const normalizedEmail = normalizeEmail(email);
 
-    if (!validateEmail(emailNormalizado)) {
+    // Impede que uma entrada inválida chegue ao armazenamento.
+    if (!validateEmail(normalizedEmail)) {
       setErro("Informe um e-mail válido.");
       return;
     }
@@ -39,12 +33,13 @@ export default function Access() {
     setCarregando(true);
 
     try {
-      perfilRepository.save(emailNormalizado);
-
-      router.replace("/plots");
+      // A operação salva no MMKV e, após sucesso, atualiza o contexto.
+      selectProfile(normalizedEmail);
     } catch {
+      // Preserva o texto digitado para permitir uma nova tentativa.
       setErro("Não foi possível salvar o perfil.");
     } finally {
+      // Encerra o estado de processamento mesmo quando ocorre falha.
       setCarregando(false);
     }
   }

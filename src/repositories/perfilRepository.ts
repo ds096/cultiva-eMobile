@@ -1,21 +1,37 @@
 import { createMMKV } from "react-native-mmkv";
 
-const storage = createMMKV({
-  id: "cultiva-e-perfil",
-});
+type Storage = ReturnType<typeof createMMKV>;
+
+let storage: Storage | null = null;
 
 const PERFIL_KEY = "perfil.email";
 
+// Cria o armazenamento apenas quando alguma operação precisar dele.
+function getStorage(): Storage {
+  if (storage === null) {
+    // Se a criação falhar, a atribuição não acontece:
+    // storage continua null e uma nova tentativa poderá criar a instância.
+    storage = createMMKV({
+      id: "cultiva-e-perfil",
+    });
+  }
+
+  return storage;
+}
+
 export const perfilRepository = {
+  // Persiste a seleção no armazenamento compartilhado.
   save(email: string): void {
-    storage.set(PERFIL_KEY, email);
+    getStorage().set(PERFIL_KEY, email);
   },
 
-  get(): string | undefined | null {
-    return storage.getString(PERFIL_KEY);
+  // Retorna null somente quando a leitura termina sem encontrar seleção.
+  get(): string | null {
+    return getStorage().getString(PERFIL_KEY) ?? null;
   },
 
+  // Remove apenas a seleção atual.
   remove(): void {
-    storage.remove(PERFIL_KEY);
+    getStorage().remove(PERFIL_KEY);
   },
 };
