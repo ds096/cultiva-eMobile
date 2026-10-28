@@ -4,6 +4,7 @@ const { withAppBuildGradle } = require('expo/config-plugins');
 const start = '// @generated begin cultiva-cmake';
 const end = '// @generated end cultiva-cmake';
 
+/** Recebe o conteúdo Gradle como texto, sem alterar o contrato do plugin. @param {string} contents */
 function configureCmake(contents) {
   const newline = contents.includes('\r\n') ? '\r\n' : '\n';
   // Substitui somente o bloco deste plugin e a configuracao manual original.
@@ -28,6 +29,7 @@ function configureCmake(contents) {
   ].join(newline);
 }
 
+/** Verifica a configuração recebida pelo Expo em modo estrito. @param {Parameters<typeof withAppBuildGradle>[0]} config */
 module.exports = function withCmakeVersion(config) {
   return withAppBuildGradle(config, (mod) => {
     if (mod.modResults.language !== 'groovy') {

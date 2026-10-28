@@ -20,22 +20,22 @@ Um módulo agrupa várias atividades; não é uma tarefa para executar de uma ve
 
 **Base já validada pelo responsável:** `src/theme/theme.ts`. Essa validação não conclui o módulo de interface nem garante compilação do aplicativo.
 
-| Módulo                       | Resultado principal                                    | Estado                                   |
-| ---------------------------- | ------------------------------------------------------ | ---------------------------------------- |
-| 0. Produto e diagnóstico     | Entender o produto e a situação real do projeto        | Concluído pelo responsável em 18/10/2026 |
+| Módulo                       | Resultado principal                                    | Estado                                               |
+| ---------------------------- | ------------------------------------------------------ | ---------------------------------------------------- |
+| 0. Produto e diagnóstico     | Entender o produto e a situação real do projeto        | Concluído pelo responsável em 18/10/2026             |
 | 1. Fundamentos e estrutura   | Compreender responsabilidades e fluxo de dados         | Concluído pelo responsável; confirmado em 23/10/2026 |
 | 2. Base visual e navegação   | Preparar componentes e caminhos entre telas            | Concluído pelo responsável; confirmado em 23/10/2026 |
-| 3. Acesso por perfil local   | Selecionar e restaurar um perfil local                 | 3.1 a 3.4 concluídas; 3.5 em andamento; 3.6 pendente |
-| 4. Persistência e talhões    | Manter cadastros e revisões no dispositivo             | Pendente                                 |
-| 5. Planos de manejo          | Criar modelos próprios de atividades                   | Pendente                                 |
-| 6. Atividades dos talhões    | Importar cópias e organizar o planejamento             | Pendente                                 |
-| 7. Insumos e cálculos        | Cadastrar aquisições e definir cálculos confiáveis     | Pendente                                 |
-| 8. Lançamento único          | Registrar execução uma única vez, sem edição posterior | Pendente                                 |
-| 9. Fotos e histórico         | Preservar fotos e consultar o que foi realizado        | Pendente                                 |
-| 10. Calendário e lembretes   | Consultar a agenda e receber notificações locais       | Pendente                                 |
-| 11. Backend e autenticação   | Identificar o produtor e proteger seus dados remotos   | Pendente                                 |
-| 12. Sincronização            | Enviar e reconciliar dados e fotos com segurança       | Pendente                                 |
-| 13. Qualidade e distribuição | Validar e distribuir a versão Android                  | Pendente                                 |
+| 3. Acesso por perfil local   | Selecionar e restaurar um perfil local                 | Concluído por decisão do responsável em 28/10/2026   |
+| 4. Persistência e talhões    | Manter cadastros e revisões no dispositivo             | Pendente                                             |
+| 5. Planos de manejo          | Criar modelos próprios de atividades                   | Pendente                                             |
+| 6. Atividades dos talhões    | Importar cópias e organizar o planejamento             | Pendente                                             |
+| 7. Insumos e cálculos        | Cadastrar aquisições e definir cálculos confiáveis     | Pendente                                             |
+| 8. Lançamento único          | Registrar execução uma única vez, sem edição posterior | Pendente                                             |
+| 9. Fotos e histórico         | Preservar fotos e consultar o que foi realizado        | Pendente                                             |
+| 10. Calendário e lembretes   | Consultar a agenda e receber notificações locais       | Pendente                                             |
+| 11. Backend e autenticação   | Identificar o produtor e proteger seus dados remotos   | Pendente                                             |
+| 12. Sincronização            | Enviar e reconciliar dados e fotos com segurança       | Pendente                                             |
+| 13. Qualidade e distribuição | Validar e distribuir a versão Android                  | Pendente                                             |
 
 As tecnologias já aprovadas não precisam ser escolhidas novamente. Decisões detalhadas pendentes devem ser resolvidas antes da atividade que depende delas. A arquitetura crescerá com necessidades concretas, sem construir todas as camadas antecipadamente.
 
@@ -43,16 +43,16 @@ As tecnologias já aprovadas não precisam ser escolhidas novamente. Decisões d
 
 ## Estrutura e fluxo de dados atuais — 23/10/2026
 
-| Arquivo em `src/` | Responsabilidade atual |
-| --- | --- |
-| `app/_layout.tsx` | Aplica o tema com `PaperProvider` e monta `ProfileProvider` e `Navigation`, com as rotas `index` e `plots`. |
-| `app/index.tsx` | Tela `Access`: entrada de e-mail, validação, gravação e solicitação de navegação. |
-| `app/plots.tsx` | Tela temporária `Plots`, com título e ação de saída; ainda não cadastra talhões. |
-| `components/AppButton.tsx` | Botão compartilhado baseado no Paper, com propriedades de carregamento e desabilitação. |
-| `context/PerfilContext.tsx` | Estado compartilhado do e-mail, `ProfileProvider`, `useProfile`, `selectProfile` e `clearProfile`. |
-| `repositories/perfilRepository.ts` | Encapsula leitura, gravação e remoção da seleção no MMKV. |
-| `utilities/email.ts` | `normalizeEmail` remove espaços externos e converte para minúsculas; `validateEmail` verifica formato básico. |
-| `theme/theme.ts` | Centraliza tokens e configuração visual do Paper. |
+| Arquivo em `src/`                  | Responsabilidade atual                                                                                        |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `app/_layout.tsx`                  | Aplica o tema com `PaperProvider` e monta `ProfileProvider` e `Navigation`, com as rotas `index` e `plots`.   |
+| `app/index.tsx`                    | Tela `Access`: entrada de e-mail, validação, gravação e solicitação de navegação.                             |
+| `app/plots.tsx`                    | Tela temporária `Plots`, com título e ação de saída; ainda não cadastra talhões.                              |
+| `components/AppButton.tsx`         | Botão compartilhado baseado no Paper, com propriedades de carregamento e desabilitação.                       |
+| `context/PerfilContext.tsx`        | Estado compartilhado do e-mail, `ProfileProvider`, `useProfile`, `selectProfile` e `clearProfile`.            |
+| `repositories/perfilRepository.ts` | Encapsula leitura, gravação e remoção da seleção no MMKV.                                                     |
+| `utilities/email.ts`               | `normalizeEmail` remove espaços externos e converte para minúsculas; `validateEmail` verifica formato básico. |
+| `theme/theme.ts`                   | Centraliza tokens e configuração visual do Paper.                                                             |
 
 A entrada ativa declarada no `package.json` é `expo-router/entry`. O `index.js` da raiz permanece no projeto, mas não é a entrada declarada. MMKV e Nitro Modules já constam nas dependências, ao contrário do estado registrado após o reinício de 19/10. Nesta atividade não houve instalação ou comprovação de funcionamento nativo em aparelho.
 
@@ -140,6 +140,8 @@ Referências consultadas: [Expo SDK 58](https://docs.expo.dev/versions/v58.0.0/)
 **Perguntas de revisão:** qual diferença entre token e cor fixa na tela? O que um provedor compartilha? Por que todas as telas não devem conter seus próprios botões diferentes?
 
 ## Módulo 3 — Acesso por perfil local
+
+**Estado em 28/10/2026:** concluído por decisão expressa do responsável. Foram solicitados somente os itens 2, 3, 4 e 6 de `PENDENCIAS-MODULO-3.md`: aviso de perfil local, tema/teclado/acessibilidade, prevenção de repetição e TypeScript estrito. Essa conclusão registra o progresso acordado; não comprova testes em aparelho. O estado vazio (item 5) e a matriz de validação funcional (item 7) ficaram fora desta implementação. Os registros de 23/10 abaixo são históricos.
 
 **Estado em 23/10/2026:** atividades 3.1, 3.2, 3.3 e 3.4 concluídas pelo responsável; 3.5 em andamento; 3.6 pendente.
 
@@ -401,48 +403,3 @@ Tratar os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) em pequenas 
 **Critérios de conclusão:** jornada validada em dispositivo, regras críticas verificadas e bloqueios resolvidos ou explicitamente delimitados antes da distribuição. Registrar o que foi realmente testado; compilação bem-sucedida não substitui teste da experiência.
 
 **Perguntas de revisão:** quais falhas causariam perda de confiança ou dados? O que foi testado em aparelho e o que só foi inspecionado? Como uma atualização preserva registros ainda não enviados?
-
-## Registro das próximas atividades
-
-### Aplicação dos ajustes 1 e 4 da revisão — 23/10/2026
-
-Aplicado em `src/app/_layout.tsx`: rota `plots` no lugar de `talhoes` e `PaperProvider` recebendo o tema existente. Aprendizado: o nome da rota acompanha o arquivo, enquanto o título permanece em português; o provedor compartilha o tema com os componentes Paper descendentes.
-
-Verificações: lint passou sem avisos; typecheck continua falhando pelo contrato de `email` no contexto, pendência do ponto 5. `git diff --check` não encontrou problemas de espaços. Não houve teste em aparelho. Os pontos 2, 3 e 5 foram incluídos explicitamente na etapa 3.5, sem alterações na implementação. Próximo exercício: unificar o contrato de ausência do perfil e seguir as pendências dessa etapa; o módulo 3 permanece em andamento.
-
-### Atualização do progresso, nomes e avaliação — 23/10/2026
-
-Atividade: registrar os módulos anteriores à etapa 3.5 como concluídos pelo responsável, documentar a estrutura existente e renomear funções para inglês com comentários explicativos. Aprendizado: o repositório persiste dados, enquanto o contexto mantém o estado observado pela interface; modificar o primeiro não atualiza automaticamente o segundo.
-
-Verificações antes e depois da renomeação: `npm run lint` terminou sem erros e com dois avisos preexistentes, por `PaperProvider` e `theme` não utilizados. `npm run typecheck` falhou nas duas execuções pelo mesmo contrato incompatível de `email` em `src/context/PerfilContext.tsx` (`undefined` não aceito pelo contexto). Nenhuma correção estrutural ou instalação foi realizada. Não houve teste em aparelho.
-
-Próximo exercício: continuar a etapa 3.5, alinhando a rota `plots` ao layout e fazendo as telas consumirem as operações do contexto. Resolver o contrato de ausência de perfil e o tratamento de falha de leitura, depois verificar entrada e restauração após reiniciar. A etapa 3.6 e os módulos seguintes permanecem pendentes.
-
-**Histórico abaixo:** os registros de 18 a 20/10 descrevem a árvore e as verificações daquelas datas; não substituem o estado atual descrito acima.
-
-### Preparação após o reinício — 19/10/2026
-
-O projeto foi recriado com o template blank. A pedido do responsável, o agente instalou as bibliotecas de preparação (ESLint e TypeScript), navegação (Expo Router e dependências) e interface (Paper, ícones e System UI). Criou configuração ESLint e TypeScript estrito com verificação dos arquivos JavaScript atuais, preservando `App.js` e a mensagem “Olá mundo!”.
-
-Conceito desta atividade: instalar disponibiliza a biblioteca; configurar rotas e provedores é uma atividade posterior. A entrada permanece `index.js` → `App.js`. Próximo exercício: compreender a verificação de tipos e preparar a primeira rota em uma atividade pequena. O tema antigo não existe na nova base; sua paleta continua documentada no guia visual. Os registros abaixo descrevem o estado anterior ao reinício, não o estado técnico atual.
-
-Verificações: lint e typecheck passaram; versões conferidas pelo Expo; árvore npm sem conflitos. Prebuild Android aplicado sem instalação adicional e sem recriar a pasta, com o plugin de System UI explícito. Teste da nova compilação no celular pendente. A auditoria npm reportou 26 alertas (7 moderados e 19 altos), ainda a avaliar; não foram aplicadas correções forçadas que alterariam o SDK.
-
-O tema foi validado pelo responsável. O módulo 0 foi declarado concluído pelo responsável em 18/10/2026; os demais módulos continuam pendentes. Os bloqueios técnicos permanecem abertos, conforme [contex.md](contex.md). A conclusão do diagnóstico não comprova funcionamento do aplicativo.
-
-| Atividade                 | Estado                                   | Evidência ou próximo passo                                                                                                                                               |
-| ------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 0 — Produto e diagnóstico | Concluído pelo responsável em 18/10/2026 | Confirmada a seleção de perfil por e-mail na primeira versão, sem novas decisões de produto. Bloqueios de preparação ainda não resolvidos; `src/` contém somente o tema. |
-| 1.1 — Ler TypeScript      | Pendente                                 | Explicar tipos de entrada e saída, valores opcionais e erros; manter `strict` habilitado.                                                                                |
-
-Depois de cada atividade, registrar: identificador, data, objetivo, o que você implementou, conceitos compreendidos, verificações executadas, bloqueios e próximo exercício. Atualizar também o contexto se houver decisão de produto aprovada.
-
-**Diagnóstico atualizado nesta entrega:** somente o tema está presente sob `src/`; o typecheck falha pela ausência de `react-native-paper`. O lint está bloqueado por falta de preparação e não foi executado para evitar instalação automática. O diagnóstico inicial e a mudança observada na árvore de arquivos estão em [contex.md](contex.md). A resolução será feita em atividades acordadas; não instalar dependências nem alterar o tema para encobrir esses problemas.
-
-### Persistencia do CMake no Windows — 20/10/2026
-
-A pedido do responsavel, configuracao CMake 4.1.2 persistida com plugin Expo local para o app e patch-package para Reanimated 4.7.1. Mantido o diretorio cultiva-ev2. Adicionado script typecheck para executar o TypeScript ja instalado. Detalhes e comandos em CMAKE-WINDOWS.md.
-
-Conceito: android/ e node_modules/ sao gerados; a fonte permanente da configuracao fica no plugin e no patch versionaveis. Verificacoes aprovadas: plugin sem duplicacao, Prebuild regenerado e repetido, patch no arquivo original, postinstall local duas vezes, lint, tipos e compatibilidade Expo. Build Debug arm64 passou em 5m 9s. Teste em aparelho, release e outras arquiteturas nao executados. npm ci completo nao executado; testada a restauracao do arquivo original da dependencia. Alertas de depreciacao e auditoria registrados no documento tecnico.
-
-Proximo exercicio: identificar por que reinstalar dependencias remove edicoes manuais e como postinstall reaplica o patch; depois executar o aplicativo no celular para conferir a experiencia. Nenhum modulo funcional declarado concluido.

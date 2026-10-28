@@ -1,114 +1,102 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from "react-native";
+import { Text } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { AppButton } from "../components/AppButton";
 import { useProfile } from "../context/PerfilContext";
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  ActivityIndicator,
-  StyleSheet,
-} from "react-native";
-
+import { theme, tokens } from "../theme/theme";
 import { normalizeEmail, validateEmail } from "../utilities/email";
 
-// Apresenta o formulário de seleção do perfil neste dispositivo.
+// Seleciona um perfil local sem comprovar a identidade do produtor.
 export default function Access() {
   const { selectProfile } = useProfile();
-
   const [email, setEmail] = useState("");
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
+  const [focused, setFocused] = useState(false);
+  // A trava muda imediatamente, antes da próxima renderização.
+  const submitting = useRef(false);
 
-  // Valida e salva a seleção antes de solicitar a navegação.
   function handleContinue() {
+    if (submitting.current) return;
     const normalizedEmail = normalizeEmail(email);
-
-    // Impede que uma entrada inválida chegue ao armazenamento.
     if (!validateEmail(normalizedEmail)) {
       setErro("Informe um e-mail válido.");
       return;
     }
-
+    submitting.current = true;
     setErro("");
     setCarregando(true);
-
     try {
-      // A operação salva no MMKV e, após sucesso, atualiza o contexto.
+      // MMKV é síncrono: não acrescentamos espera artificial para mostrar animação.
       selectProfile(normalizedEmail);
+      // Mantém a trava no sucesso até o layout desmontar esta tela.
     } catch {
-      // Preserva o texto digitado para permitir uma nova tentativa.
-      setErro("Não foi possível salvar o perfil.");
-    } finally {
-      // Encerra o estado de processamento mesmo quando ocorre falha.
+      // Libera nova tentativa apenas na falha, preservando o texto digitado.
+      submitting.current = false;
       setCarregando(false);
+      setErro("Não foi possível salvar o perfil. Tente novamente.");
     }
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.titulo}>Cultiva-e</Text>
-
-      <Text>Informe seu e-mail</Text>
-
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={(texto) => {
-          setEmail(texto);
-          setErro("");
-        }}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoComplete="email"
-        placeholder="seuemail@exemplo.com"
-        editable={!carregando}
-      />
-
-      {erro !== "" && <Text style={styles.erro}>{erro}</Text>}
-
-      <Pressable
-        style={styles.botao}
-        onPress={handleContinue}
-        disabled={carregando}
-      >
-        {carregando ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.textoBotao}>Continuar</Text>
-        )}
-      </Pressable>
-    </View>
+    // O cabeçalho já protege o topo; preservamos as outras bordas.
+    <SafeAreaView style={styles.screen} edges={["left", "right", "bottom"]}>
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+          <View style={styles.form}>
+            <Text variant="headlineSmall" accessibilityRole="header">cultiva-eV2</Text>
+            <Text variant="bodyLarge">
+              Este perfil fica salvo neste dispositivo. Não há senha nem verificação
+              de identidade. Este acesso não autentica você em um servidor.
+            </Text>
+            {/* O rótulo permanece visível depois da digitação. */}
+            <Text nativeID="email-label" variant="bodyLarge">Informe seu e-mail</Text>
+            <TextInput
+              style={[styles.input, focused && styles.focused]}
+              accessibilityLabel="Informe seu e-mail"
+              accessibilityLabelledBy="email-label"
+              value={email}
+              onChangeText={(texto) => { setEmail(texto); setErro(""); }}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="email"
+              placeholder="seuemail@exemplo.com"
+              placeholderTextColor={theme.colors.onSurfaceVariant}
+              selectionColor={theme.colors.primary}
+              editable={!carregando}
+              returnKeyType="done"
+              onSubmitEditing={handleContinue}
+            />
+            {/* A região persistente anuncia mudanças de erro ao leitor de tela. */}
+            <Text variant="bodyLarge" accessibilityRole="alert" accessibilityLiveRegion="polite" style={styles.error}>{erro}</Text>
+            <AppButton title={carregando ? "Abrindo perfil…" : "Continuar"} onPress={handleContinue} loading={carregando} />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
+// Medidas mínimas e rolagem permitem crescimento com a escala de fonte.
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 8,
-    gap: 12,
-  },
-  titulo: {
-    fontSize: 28,
-    fontWeight: "bold",
-  },
+  flex: { flex: 1 },
+  screen: { flex: 1, backgroundColor: theme.colors.background },
+  container: { flexGrow: 1, justifyContent: "center", alignItems: "center", padding: tokens.space.md },
+  form: { width: "100%", maxWidth: tokens.size.formWidth, gap: tokens.space.md },
   input: {
-    borderWidth: 1,
-    borderColor: "#aaa",
-    borderRadius: 8,
-    padding: 12,
+    ...theme.fonts.bodyLarge,
+    minHeight: tokens.size.input,
+    color: theme.colors.onSurface,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 2,
+    borderColor: tokens.color.controlBorder,
+    borderRadius: tokens.radius.input,
+    padding: tokens.space.md,
   },
-  erro: {
-    color: "red",
-  },
-  botao: {
-    backgroundColor: "#2E7D32",
-    padding: 14,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  textoBotao: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
+  focused: { borderColor: theme.colors.primary },
+  error: { color: theme.colors.error },
 });
