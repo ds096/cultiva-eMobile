@@ -51,6 +51,11 @@ function Navigation() {
 
       <Stack.Protected guard={!!email}>
         <Stack.Screen name="plots" options={{ title: "Meus Talhões" }} />
+        {/* As telas provisórias exibem apenas a mensagem e o menu, com perfil selecionado. */}
+        <Stack.Screen name="calendar" options={{ headerShown: false }} />
+        <Stack.Screen name="supplies" options={{ headerShown: false }} />
+        <Stack.Screen name="plans" options={{ headerShown: false }} />
+        <Stack.Screen name="settings" options={{ headerShown: false }} />
       </Stack.Protected>
     </Stack>
   );

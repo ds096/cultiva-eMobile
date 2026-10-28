@@ -1,5 +1,13 @@
 import { useRef, useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from "react-native";
+import {
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
 import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AppButton } from "../components/AppButton";
@@ -42,22 +50,43 @@ export default function Access() {
   return (
     // O cabeçalho já protege o topo; preservamos as outras bordas.
     <SafeAreaView style={styles.screen} edges={["left", "right", "bottom"]}>
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.form}>
-            <Text variant="headlineSmall" accessibilityRole="header">cultiva-eV2</Text>
+            {/* A imagem local acompanha o aplicativo e mantém sua proporção. */}
+            <Image
+              source={require("../../assets/icon.png")}
+              style={styles.icon}
+              resizeMode="contain"
+              accessible
+              accessibilityLabel="Ícone do cultiva-e"
+            />
+            <Text variant="headlineSmall" accessibilityRole="header">
+              cultiva-eV
+            </Text>
             <Text variant="bodyLarge">
-              Este perfil fica salvo neste dispositivo. Não há senha nem verificação
-              de identidade. Este acesso não autentica você em um servidor.
+              Este perfil fica salvo neste dispositivo. Não há senha nem
+              verificação de identidade.
             </Text>
             {/* O rótulo permanece visível depois da digitação. */}
-            <Text nativeID="email-label" variant="bodyLarge">Informe seu e-mail</Text>
+            <Text nativeID="email-label" variant="bodyLarge">
+              Informe seu e-mail
+            </Text>
             <TextInput
               style={[styles.input, focused && styles.focused]}
               accessibilityLabel="Informe seu e-mail"
               accessibilityLabelledBy="email-label"
               value={email}
-              onChangeText={(texto) => { setEmail(texto); setErro(""); }}
+              onChangeText={(texto) => {
+                setEmail(texto);
+                setErro("");
+              }}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               keyboardType="email-address"
@@ -72,8 +101,19 @@ export default function Access() {
               onSubmitEditing={handleContinue}
             />
             {/* A região persistente anuncia mudanças de erro ao leitor de tela. */}
-            <Text variant="bodyLarge" accessibilityRole="alert" accessibilityLiveRegion="polite" style={styles.error}>{erro}</Text>
-            <AppButton title={carregando ? "Abrindo perfil…" : "Continuar"} onPress={handleContinue} loading={carregando} />
+            <Text
+              variant="bodyLarge"
+              accessibilityRole="alert"
+              accessibilityLiveRegion="polite"
+              style={styles.error}
+            >
+              {erro}
+            </Text>
+            <AppButton
+              title={carregando ? "Abrindo perfil…" : "Continuar"}
+              onPress={handleContinue}
+              loading={carregando}
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -85,8 +125,24 @@ export default function Access() {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   screen: { flex: 1, backgroundColor: theme.colors.background },
-  container: { flexGrow: 1, justifyContent: "center", alignItems: "center", padding: tokens.space.md },
-  form: { width: "100%", maxWidth: tokens.size.formWidth, gap: tokens.space.md },
+  container: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: tokens.space.md,
+  },
+  form: {
+    width: "100%",
+    maxWidth: tokens.size.formWidth,
+    gap: tokens.space.md,
+  },
+  // Limita o ícone sem ultrapassar a largura disponível em telas estreitas.
+  icon: {
+    width: "100%",
+    maxWidth: 160,
+    aspectRatio: 1,
+    alignSelf: "center",
+  },
   input: {
     ...theme.fonts.bodyLarge,
     minHeight: tokens.size.input,

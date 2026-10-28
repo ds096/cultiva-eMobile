@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { Text } from "react-native-paper";
 import { AppButton } from "../components/AppButton";
+import Menu from "../components/Menu";
 import { useProfile } from "../context/PerfilContext";
+import { theme } from "../theme/theme";
 
 export default function Plots() {
   // A operação atualiza armazenamento e estado compartilhado.
@@ -24,11 +26,14 @@ export default function Plots() {
     }
   }
   return (
-    // Tela temporária para estudar navegação.
-    <View style={{ flex: 1, padding: 24 }}>
-      <Text variant="headlineSmall">Meus talhões</Text>
-      {erro !== "" && <Text>{erro}</Text>}
-      <AppButton title="Sair" onPress={handleExit} />
+    // O conteúdo rola separadamente; o menu ocupa o rodapé sem cobrir a tela.
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
+        <Text variant="headlineSmall">Meus talhões</Text>
+        {erro !== "" && <Text>{erro}</Text>}
+        <AppButton title="Sair" onPress={handleExit} />
+      </ScrollView>
+      <Menu />
     </View>
   );
 }

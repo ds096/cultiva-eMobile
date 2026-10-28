@@ -2,6 +2,29 @@
 
 ## Como usar esta trilha
 
+### Telas provisórias do menu — 28/10/2026
+
+- Atividade: criadas as rotas `calendar`, `supplies`, `plans` e `settings`, contendo somente “Tela em desenvolvimento” centralizado e o menu inferior. O menu agora abre essas telas e destaca a rota ativa. Talhões mantém seu conteúdo existente.
+- Ajuste de nomenclatura solicitado em 28/10/2026: Insumos usa o arquivo `supplies.tsx`, o componente `Supplies` e a rota `/supplies`, substituindo `inputs`. As referências do menu e do layout foram atualizadas em conjunto.
+- Aprendizado: cada arquivo de tela em `src/app/` define uma rota. As novas telas foram incluídas no grupo que exige perfil local selecionado e tiveram o cabeçalho ocultado. Essa restrição local não equivale a autenticação remota.
+- Verificações: lint passou; typecheck encontrou somente o erro preexistente TS7016 em `eslint.config.js:3`, relacionado a `eslint-config-expo/flat`. Nenhuma dependência instalada. Navegação e aparência em aparelho ainda não verificadas.
+- Próximo exercício: abrir cada opção, conferir o destaque do menu e o botão Voltar no Android, incluindo fonte ampliada. As funcionalidades dos módulos continuam pendentes.
+
+### Ícone na tela de acesso — 28/10/2026
+
+- Atividade: adicionado `assets/icon.png` acima do título em `src/app/index.tsx`, centralizado, com largura máxima de 160, proporção quadrada e descrição acessível.
+- Aprendizado: `Image` com recurso local inclui a imagem no aplicativo; `contain` preserva seu conteúdo sem recortar. Nenhuma dependência adicionada.
+- Verificações: lint passou; typecheck continua bloqueado pelo TS7016 em `eslint.config.js:3`, sem diagnóstico na tela alterada. Validação visual em aparelho pendente.
+- Próximo exercício: conferir o ícone e o acesso ao formulário com teclado aberto em tela estreita.
+
+### Ajuste do nome instalado — 28/10/2026
+
+- Atividade: alterado `expo.name` em `app.json` de `MeuProjeto` para `cultiva-e`, conforme solicitado. Identificador Android preservado como `com.daniels096.MeuProjeto`.
+- Aprendizado: `expo.name` define o nome visível; renomear o arquivo APK não altera esse rótulo. A mudança exige nova compilação e instalação.
+- Verificações: Expo Prebuild Android executado com `--no-install`; `app_name` gerado confirmado como `cultiva-e` e configuração CMake 4.1.2 preservada. Lint passou. Typecheck falhou em `eslint.config.js:3` com TS7016, por ausência de declaração de tipos para `eslint-config-expo/flat`, fora do ajuste de nome.
+- Pendência e próximo exercício: gerar um novo APK pelo fluxo de compilação utilizado e conferir o nome no instalador e abaixo do ícone no celular. APK e teste em aparelho não realizados nesta atividade. Nenhuma dependência instalada.
+- Referência: [configuração do Expo SDK 58](https://docs.expo.dev/versions/v58.0.0/config/app/#name).
+
 Você escreve o código; o agente explica, propõe uma atividade pequena e revisa seu resultado. Peça implementação pelo agente somente quando desejar essa ajuda. Todo código novo ou alterado, inclusive exemplos, deve ter comentários explicativos. Nenhuma biblioteca será instalada sem sua autorização.
 
 A primeira tela vista pelo produtor é a de acesso, mas a construção começa por entender o problema e preparar a base que sustenta essa tela. Vamos desenvolver o fluxo local primeiro; autenticação definitiva, backend e sincronização vêm depois. “Local primeiro” não significa que essas partes remotas sejam opcionais.
