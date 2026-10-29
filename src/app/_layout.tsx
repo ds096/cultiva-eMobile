@@ -45,13 +45,14 @@ function Navigation() {
   }
   return (
     <Stack>
-      <Stack.Protected guard={!email}>
-        <Stack.Screen name="index" options={{ title: "Entrar" }} />
+      {/* Após salvar o perfil, o destino é Talhões, independentemente da ordem das rotas. */}
+      <Stack.Protected guard={!email} redirectTo="/plots">
+        <Stack.Screen name="index" options={{ headerShown: false }} />
       </Stack.Protected>
 
-      <Stack.Protected guard={!!email}>
+      {/* Ao sair, a seleção é removida e a navegação retorna à tela de acesso. */}
+      <Stack.Protected guard={!!email} redirectTo="/">
         <Stack.Screen name="plots" options={{ title: "Meus Talhões" }} />
-        {/* As telas provisórias exibem apenas a mensagem e o menu, com perfil selecionado. */}
         <Stack.Screen name="calendar" options={{ headerShown: false }} />
         <Stack.Screen name="supplies" options={{ headerShown: false }} />
         <Stack.Screen name="plans" options={{ headerShown: false }} />

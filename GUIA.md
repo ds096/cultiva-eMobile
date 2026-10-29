@@ -2,6 +2,26 @@
 
 ## Como usar esta trilha
 
+### Correção da tela de acesso e destino de Continuar — 29/10/2026
+
+- Atividade: logo fixa fora da rolagem, próxima ao topo e com margens laterais de 16. Largura calculada pela tela e áreas seguras, limitada à largura do formulário; altura explicitamente igual a um terço da largura. Textos, campo de e-mail e botão ficam logo abaixo. A tela agora protege a área segura superior, pois o cabeçalho nativo está oculto.
+- Diagnóstico e aprendizado: no emulador 1080 × 2400, a área da imagem ocupava 1424 pixels de altura, apesar da intenção de proporção 3:1. Dimensões explícitas reduziram essa área para 332 pixels. O emulador também precisava de recarga para aplicar os arquivos atuais. Imagem local e `resizeMode="contain"` não substituem a definição do espaço ocupado no layout.
+- Navegação: o botão mantém a validação e salva pelo contexto. O grupo de acesso usa `redirectTo="/plots"` quando existe perfil selecionado; a saída retorna a `/`. O destino fica explícito no layout, sem depender da ordem das telas nem navegar antes da atualização do contexto.
+- Verificações: teste no emulador confirmou logo em `[42,105][1038,437]`, campo e botão visíveis sem rolagem, validação de e-mail vazio, seleção de um perfil de teste isolado seguida de abertura de “Meus talhões” e saída de volta ao acesso com campo vazio. Durante a digitação, a posição da logo permaneceu fixa. O perfil de teste foi encerrado; nenhum cadastro de produção foi criado.
+- Lint passou. Typecheck continua com apenas o erro preexistente TS7016 em `eslint.config.js:3`. Nenhuma biblioteca instalada ou alteração nativa nesta atividade. Sem validação de iOS/TalkBack; próximo exercício: conferir o fluxo no celular e com fonte ampliada.
+- Referência: [redirecionamento explícito de rotas protegidas no Expo SDK 58](https://docs.expo.dev/router/advanced/protected/#redirect-to-a-specific-route).
+
+### Logo, espaço da tela de acesso e abertura nativa — 28/10/2026
+
+- Atividade: a tela de acesso usa `assets/logo_plus_name.png` na proporção original de 3:1, com largura máxima de 320. O formulário começa próximo ao topo; o título que repetia o nome da logo foi removido e a mensagem de erro só ocupa espaço quando existe. Rolagem, teclado e ampliação de fonte foram preservados.
+- Caminhos conferidos: as imagens estão em `assets/` na raiz; não existe `src/assets/`. `app.json` usa `assets/icon.png` como ícone instalado e `assets/logo_plus_name.png` como imagem da abertura, com fundo `#F7FAF7`, largura 200 e ajuste `contain`.
+- Preparação autorizada: instalado `expo-splash-screen` `~58.0.12` via Expo. A primeira tentativa falhou por restrição de rede; a instalação com acesso à rede concluiu. O npm também atualizou dependências transitivas exigidas pelo pacote.
+- Aprendizado: alterações na interface podem aparecer ao recarregar o app conectado ao servidor de desenvolvimento. Ícone e splash pertencem à aplicação nativa e exigem aplicar a configuração com Prebuild e compilar/instalar novamente. `npx expo run:android` realiza essa build local; não é necessário usar EAS para esse teste.
+- Verificações: lint passou; typecheck encontrou somente o TS7016 preexistente em `eslint.config.js:3`. A verificação Expo do pacote passou usando o mapa local de versões, sem consulta online; `npm ls --all --omit=dev` terminou sem conflitos. Prebuild Android concluído com `--no-install`; o comando regenerou a pasta nativa. A integração do splash, as imagens geradas, a identidade Android e a configuração CMake 4.1.2 foram conferidas.
+- Limites: compilação e instalação não executadas nesta atividade. A conexão com o emulador não pôde ser verificada porque o serviço ADB não iniciou no ambiente restrito. O npm reportou 9 vulnerabilidades (5 baixas, 4 altas); nenhuma correção automática de auditoria foi aplicada.
+- Próximo exercício: executar `npx expo run:android`, conferir a tela de acesso com teclado e fonte ampliada e observar o novo ícone. Para validar a abertura final, usar uma build release, por exemplo `npx expo run:android --variant release`, pois builds de desenvolvimento podem mostrar a abertura de forma diferente.
+- Referências: [SplashScreen no SDK 58](https://docs.expo.dev/versions/v58.0.0/sdk/splash-screen/) e [compilação local com Expo CLI](https://docs.expo.dev/more/expo-cli/#compiling-android).
+
 ### Telas provisórias do menu — 28/10/2026
 
 - Atividade: criadas as rotas `calendar`, `supplies`, `plans` e `settings`, contendo somente “Tela em desenvolvimento” centralizado e o menu inferior. O menu agora abre essas telas e destaca a rota ativa. Talhões mantém seu conteúdo existente.

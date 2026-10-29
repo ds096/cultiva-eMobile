@@ -21,7 +21,7 @@ const items: MenuItem[] = [
   { label: "Talhões", icon: "plots", href: "/plots" },
   { label: "Insumos", icon: "supplies", href: "/supplies" },
   { label: "Planos", icon: "plans", href: "/plans" },
-  { label: "Configurações", icon: "settings", href: "/settings" },
+  { label: "Config", icon: "settings", href: "/settings" },
 ];
 
 // Ícones de calendário, parcelas, embalagem, lista e ajustes, em uma grade 24 × 24.

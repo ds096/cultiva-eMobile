@@ -7,9 +7,13 @@ import {
   StyleSheet,
   TextInput,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { Text } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { AppButton } from "../components/AppButton";
 import { useProfile } from "../context/PerfilContext";
 import { theme, tokens } from "../theme/theme";
@@ -18,6 +22,16 @@ import { normalizeEmail, validateEmail } from "../utilities/email";
 // Seleciona um perfil local sem comprovar a identidade do produtor.
 export default function Access() {
   const { selectProfile } = useProfile();
+  const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  // Define ambas as dimensões para a imagem local não reservar sua altura original.
+  const logoWidth = Math.max(
+    0,
+    Math.min(
+      width - insets.left - insets.right - tokens.space.md * 2,
+      tokens.size.formWidth,
+    ),
+  );
   const [email, setEmail] = useState("");
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
@@ -38,7 +52,8 @@ export default function Access() {
     try {
       // MMKV é síncrono: não acrescentamos espera artificial para mostrar animação.
       selectProfile(normalizedEmail);
-      // Mantém a trava no sucesso até o layout desmontar esta tela.
+      // O layout observa o perfil salvo e redireciona para /plots.
+      // Mantém a trava até esta tela ser desmontada.
     } catch {
       // Libera nova tentativa apenas na falha, preservando o texto digitado.
       submitting.current = false;
@@ -48,28 +63,28 @@ export default function Access() {
   }
 
   return (
-    // O cabeçalho já protege o topo; preservamos as outras bordas.
-    <SafeAreaView style={styles.screen} edges={["left", "right", "bottom"]}>
+    // Sem cabeçalho nativo, a própria tela protege também a margem superior.
+    <SafeAreaView style={styles.screen}>
+      {/* Fora da rolagem: a logo fica fixa no topo, com margens de 16. */}
+      <View style={styles.brand}>
+        <Image
+          source={require("../../assets/logo_plus_name.png")}
+          style={{ width: logoWidth, height: logoWidth / 3 }}
+          resizeMode="contain"
+          accessible
+          accessibilityLabel="cultiva-e"
+        />
+      </View>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
+          style={styles.flex}
           contentContainerStyle={styles.container}
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.form}>
-            {/* A imagem local acompanha o aplicativo e mantém sua proporção. */}
-            <Image
-              source={require("../../assets/icon.png")}
-              style={styles.icon}
-              resizeMode="contain"
-              accessible
-              accessibilityLabel="Ícone do cultiva-e"
-            />
-            <Text variant="headlineSmall" accessibilityRole="header">
-              cultiva-eV
-            </Text>
             <Text variant="bodyLarge">
               Este perfil fica salvo neste dispositivo. Não há senha nem
               verificação de identidade.
@@ -100,15 +115,17 @@ export default function Access() {
               returnKeyType="done"
               onSubmitEditing={handleContinue}
             />
-            {/* A região persistente anuncia mudanças de erro ao leitor de tela. */}
-            <Text
-              variant="bodyLarge"
-              accessibilityRole="alert"
-              accessibilityLiveRegion="polite"
-              style={styles.error}
-            >
-              {erro}
-            </Text>
+            {/* Só ocupa espaço quando existe um erro, anunciado ao leitor de tela. */}
+            {erro !== "" && (
+              <Text
+                variant="bodyLarge"
+                accessibilityRole="alert"
+                accessibilityLiveRegion="polite"
+                style={styles.error}
+              >
+                {erro}
+              </Text>
+            )}
             <AppButton
               title={carregando ? "Abrindo perfil…" : "Continuar"}
               onPress={handleContinue}
@@ -125,23 +142,26 @@ export default function Access() {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   screen: { flex: 1, backgroundColor: theme.colors.background },
+  brand: {
+    alignItems: "center",
+    flexShrink: 0,
+    paddingTop: tokens.space.md,
+    paddingHorizontal: tokens.space.md,
+    paddingBottom: tokens.space.sm,
+  },
   container: {
     flexGrow: 1,
-    justifyContent: "center",
+    // Começa perto do topo, sem distribuir espaço vazio acima do formulário.
+    justifyContent: "flex-start",
     alignItems: "center",
-    padding: tokens.space.md,
+    paddingHorizontal: tokens.space.md,
+    paddingTop: tokens.space.sm,
+    paddingBottom: tokens.space.md,
   },
   form: {
     width: "100%",
     maxWidth: tokens.size.formWidth,
     gap: tokens.space.md,
-  },
-  // Limita o ícone sem ultrapassar a largura disponível em telas estreitas.
-  icon: {
-    width: "100%",
-    maxWidth: 160,
-    aspectRatio: 1,
-    alignSelf: "center",
   },
   input: {
     ...theme.fonts.bodyLarge,
