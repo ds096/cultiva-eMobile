@@ -22,7 +22,6 @@ export default function Calendar() {
         </Text>
       </SafeAreaView>
       {/* Fora da área central, o menu reserva seu espaço e respeita a barra do sistema. */}
-      <Menu />
     </View>
   );
 }

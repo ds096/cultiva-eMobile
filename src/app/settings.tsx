@@ -1,28 +1,37 @@
-import { View } from "react-native";
+import { useState } from "react";
+import { ScrollView, View } from "react-native";
 import { Text } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { AppButton } from "../components/AppButton";
 import Menu from "../components/Menu";
-import { theme, tokens } from "../theme/theme";
+import { useProfile } from "../context/PerfilContext";
+import { theme } from "../theme/theme";
 
-// Tela provisória: centraliza o aviso na área disponível acima do menu fixo.
-export default function Settings() {
+export default function Plots() {
+  // A operação atualiza armazenamento e estado compartilhado.
+  const { clearProfile } = useProfile();
+
+  // Guarda uma falha de saída para apresentá-la na própria tela.
+  const [erro, setErro] = useState("");
+
+  // Solicita a saída e mantém o perfil ativo se a remoção falhar.
+  function handleExit() {
+    setErro("");
+
+    try {
+      // Após remover a seleção, o provedor atualiza email para null.
+      clearProfile();
+    } catch {
+      // A mensagem permite compreender por que a tela permaneceu aberta.
+      setErro("Não foi possível sair do perfil. Tente novamente.");
+    }
+  }
   return (
+    // O conteúdo rola separadamente; o menu ocupa o rodapé sem cobrir a tela.
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <SafeAreaView
-        edges={["top", "left", "right"]}
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          padding: tokens.space.lg,
-        }}
-      >
-        <Text variant="bodyLarge" style={{ textAlign: "center" }}>
-          Tela em desenvolvimento
-        </Text>
-      </SafeAreaView>
-      {/* Fora da área central, o menu reserva seu espaço e respeita a barra do sistema. */}
-      <Menu />
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
+        {erro !== "" && <Text>{erro}</Text>}
+        <AppButton title="Sair" onPress={handleExit} />
+      </ScrollView>
     </View>
   );
 }

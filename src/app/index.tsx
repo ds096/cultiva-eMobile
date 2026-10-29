@@ -89,7 +89,6 @@ export default function Access() {
               Este perfil fica salvo neste dispositivo. Não há senha nem
               verificação de identidade.
             </Text>
-            {/* O rótulo permanece visível depois da digitação. */}
             <Text nativeID="email-label" variant="bodyLarge">
               Informe seu e-mail
             </Text>

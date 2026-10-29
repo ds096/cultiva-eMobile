@@ -1,10 +1,12 @@
 import { Stack } from "expo-router";
+
 import { theme } from "../theme/theme";
 import { AppButton } from "../components/AppButton";
 import { ProfileProvider, useProfile } from "../context/PerfilContext";
 import { ActivityIndicator, PaperProvider, Text } from "react-native-paper";
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Menu from "../components/Menu";
 
 // Define a disponibilidade das telas a partir da seleção local de perfil.
 function Navigation() {
@@ -58,6 +60,8 @@ function Navigation() {
         <Stack.Screen name="plans" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ headerShown: false }} />
       </Stack.Protected>
+
+      {!!email && <Menu />}
     </Stack>
   );
 }
