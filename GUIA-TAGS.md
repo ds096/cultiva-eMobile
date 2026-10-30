@@ -2,6 +2,31 @@
 
 Este documento apresenta os principais componentes utilizados no desenvolvimento do **cultiva-e**, explicando suas funções e quais problemas resolvem.
 
+## Resumo: quando utilizar cada componente?
+
+| Necessidade                            | Componente             |
+| -------------------------------------- | ---------------------- |
+| Agrupar e organizar elementos          | `View`                 |
+| Criar conteúdo com rolagem             | `ScrollView`           |
+| Exibir listas grandes                  | `FlatList`             |
+| Proteger áreas reservadas pelo sistema | `SafeAreaView`         |
+| Ajustar o layout ao teclado            | `KeyboardAvoidingView` |
+| Exibir imagens                         | `Image`                |
+| Exibir textos                          | `Text`                 |
+| Receber informações digitadas          | `TextInput`            |
+| Executar ações                         | `Button` / `AppButton` |
+| Exibir menu personalizado              | `Menu`                 |
+| Navegar entre telas com histórico      | `Stack`                |
+| Configurar uma tela do Stack           | `Stack.Screen`         |
+| Controlar acesso às rotas              | `Stack.Protected`      |
+| Criar navegação por abas               | `Tabs`                 |
+
+## Recomendação para o cultiva-e
+
+Utilizar os componentes do **React Native** para estrutura e comportamento, os componentes do **React Native Paper** para padronização visual e os navegadores do **Expo Router** para gerenciar a navegação.
+
+Essa separação facilita a manutenção do código, a reutilização de componentes e a organização das telas.
+
 ## 1. View
 
 **Origem:** React Native
@@ -243,28 +268,3 @@ O React Native Paper também possui um componente `Menu`, mas sua finalidade pri
 **Observação:** É uma alternativa ao menu inferior personalizado. Pode ser combinado com `Stack` para telas secundárias.
 
 ---
-
-## Resumo: quando utilizar cada componente?
-
-| Necessidade                            | Componente             |
-| -------------------------------------- | ---------------------- |
-| Agrupar e organizar elementos          | `View`                 |
-| Criar conteúdo com rolagem             | `ScrollView`           |
-| Exibir listas grandes                  | `FlatList`             |
-| Proteger áreas reservadas pelo sistema | `SafeAreaView`         |
-| Ajustar o layout ao teclado            | `KeyboardAvoidingView` |
-| Exibir imagens                         | `Image`                |
-| Exibir textos                          | `Text`                 |
-| Receber informações digitadas          | `TextInput`            |
-| Executar ações                         | `Button` / `AppButton` |
-| Exibir menu personalizado              | `Menu`                 |
-| Navegar entre telas com histórico      | `Stack`                |
-| Configurar uma tela do Stack           | `Stack.Screen`         |
-| Controlar acesso às rotas              | `Stack.Protected`      |
-| Criar navegação por abas               | `Tabs`                 |
-
-## Recomendação para o cultiva-e
-
-Utilizar os componentes do **React Native** para estrutura e comportamento, os componentes do **React Native Paper** para padronização visual e os navegadores do **Expo Router** para gerenciar a navegação.
-
-Essa separação facilita a manutenção do código, a reutilização de componentes e a organização das telas.

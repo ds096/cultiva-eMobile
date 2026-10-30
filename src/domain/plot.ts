@@ -86,34 +86,41 @@ export function validatePlantingYear(year: number): number {
   return year;
 }
 
-// // Combina as regras e cria cópias; não altera entradas nem revisões existentes.
-// export function normalizePlotInput(input: PlotInput): PlotInput {
-//   const name = normalizePlotName(input.name);
-//   const area = validatePlotArea(input.area);
-//   if (!Array.isArray(input.crops)) {
-//     throw new Error("Informe a lista de culturas do talhão.");
-//   }
-//   // Lista vazia e nomes repetidos permanecem permitidos, sem deduplicação.
-//   const crops = Array.from(input.crops, validateCrop);
-//   const plantingYear = validatePlantingYear(input.plantingYear);
-//   const location = input.location === undefined
-//     ? undefined
-//     : validateCoordinates(input.location);
+export function normalizePlotInput(input: PlotInput): PlotInput {
+  const name = normalizePlotName(input.name);
 
-//   return {
-//     name,
-//     area,
-//     crops,
-//     ...(plantingYear === undefined ? {} : { plantingYear }),
-//     ...(location === undefined ? {} : { location }),
-//   };
-// }
+  const area = validatePlotArea(input.area);
 
-// // O histórico segue a ordem de criação; consultar não ordena nem altera revisões.
-// export function getCurrentRevision(plot: Plot): PlotRevision {
-//   const revision = plot.revisions[plot.revisions.length - 1];
-//   if (revision === undefined) {
-//     throw new Error("O talhão não possui revisões.");
-//   }
-//   return revision;
-// }
+  if (input.crops.length === 0) {
+    throw new Error("Informe pelo menos uma cultura.");
+  }
+  const crops = input.crops.map(validateCrop);
+
+  const plantingYear =
+    input.plantingYear !== undefined
+      ? validatePlantingYear(input.plantingYear)
+      : undefined;
+
+  const location =
+    input.location !== undefined
+      ? validateCoordinates(input.location)
+      : undefined;
+
+  return {
+    name,
+    area,
+    crops,
+    plantingYear,
+    location,
+  };
+}
+
+// O histórico segue a ordem de criação; consultar não ordena nem altera revisões.
+
+export function getCurrentRevision(plot: Plot): PlotRevision {
+  const lastItem = plot.revisions.at(-1);
+  if (!lastItem) {
+    throw new Error("O talhão não possui revisões.");
+  }
+  return lastItem;
+}
