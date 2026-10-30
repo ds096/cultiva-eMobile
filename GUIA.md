@@ -2,6 +2,14 @@
 
 ## Como usar esta trilha
 
+### Contrato e validações de talhões — 30/10/2026
+
+- Atividade 4.1: preenchido `src/domain/plot.ts`, que estava vazio, com os tipos da aula (`Crop`, `Coordinates`, `PlotInput`, `PlotRevision` e `Plot`) e funções de validação. Nome, área e lista de culturas são obrigatórios; ano e localização são opcionais. Dados editáveis permanecem dentro das revisões.
+- Regras: nomes recebem `trim` e não podem ficar vazios; área finita positiva; quantidade inteira positiva por cultura; coordenadas finitas nos limites inclusivos de latitude e longitude. Ano, se informado, é inteiro positivo seguro; nenhum limite histórico ou bloqueio de ano futuro foi definido. Lista vazia e culturas repetidas continuam permitidas, sem deduplicação.
+- Aprendizado: tipos descrevem o contrato; validadores verificam valores durante a execução e lançam erros. `normalizePlotInput` combina as regras e devolve cópias sem modificar a entrada. `getCurrentRevision` consulta a última revisão e rejeita histórico vazio; não cria nem altera revisões. Essas funções recebem dados tipados, não substituem um futuro leitor de JSON externo.
+- Verificações: cenários executados em memória passaram, incluindo `NaN`, infinitos, zero, negativos, frações, nomes vazios, limites geográficos, opcionais ausentes, culturas repetidas e entradas congeladas. Lint: zero erros e sete avisos de imports `Menu` não utilizados em telas existentes. Typecheck: falhou somente com o TS7016 já registrado em `eslint.config.js:3` (`eslint-config-expo/flat` sem declaração de tipos).
+- Nenhuma biblioteca instalada ou dado de perfil gravado. Próximo exercício: acompanhar uma entrada válida e outra inválida por `normalizePlotInput` antes de integrar cadastro e persistência. O módulo 4 não está concluído.
+
 ### Correção da tela de acesso e destino de Continuar — 29/10/2026
 
 - Atividade: logo fixa fora da rolagem, próxima ao topo e com margens laterais de 16. Largura calculada pela tela e áreas seguras, limitada à largura do formulário; altura explicitamente igual a um terço da largura. Textos, campo de e-mail e botão ficam logo abaixo. A tela agora protege a área segura superior, pois o cabeçalho nativo está oculto.
