@@ -291,26 +291,57 @@ Tratar os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) em pequenas 
 
 **Perguntas de revisão:** por que um nome não é um bom identificador? Como diferenciar a versão atual de uma revisão? O que ocorre se a gravação falhar?
 
-## Módulo 5 — Planos de manejo
+## Módulo 5 — Menu lateral e cabeçalho compartilhado
 
-**Objetivo:** criar modelos de planejamento definidos pelo produtor.
+**Estado — 05/11/2026:** opção D (menu lateral com áreas principais) escolhida pelo responsável. Planejamento atualizado; implementação e validação pendentes. Este módulo passa a tratar do menu; o cadastro de planos anteriormente descrito aqui fica pendente de replanejamento, sem alteração dos módulos subsequentes.
 
-**Funcionalidades:** criar, consultar e ajustar planos com atividades e datas previstas, respeitando revisões aplicáveis.
+**Objetivo:** criar uma navegação compartilhada, com botão de menu imediatamente à esquerda do título da tela no cabeçalho fixo.
 
-**Conceitos:** composição de entidades, validação de intervalos, datas de calendário e modelo reutilizável.
+**Funcionalidades:** abrir e fechar um painel lateral, navegar entre as cinco áreas principais e indicar a área atual. O menu lateral substitui o menu inferior nas telas internas.
 
-**Pré-requisitos:** módulo 4; definir campos dos planos e atividades e a interpretação das datas ao reutilizar o plano.
+**Conceitos:** layout compartilhado, rotas, cabeçalho, estado de abertura, destinos principais versus ações de criação, histórico de navegação e acessibilidade.
+
+**Pré-requisitos:** base visual e navegação dos módulos anteriores; conferir as rotas existentes e a documentação correspondente ao Expo instalado antes de implementar. Usar Expo Router e o tema compartilhado. Caso a solução exija novas dependências, apresentar a necessidade e obter autorização antes de instalar.
+
+**Referência visual aprovada:** alternativa **D**, à direita na [imagem do menu lateral](docs/referencias/navegacao-2026-11-05/02-menu-lateral.png). O [registro do estudo](docs/referencias/navegacao-2026-11-05/REFERENCIAS.md) preserva a comparação original; sua recomendação inicial por B foi substituída pela decisão do responsável por D. A posição do botão segue a decisão abaixo, mesmo que a imagem mostre a marca no cabeçalho.
+
+### Onde o menu aparece
+
+| Tela ou grupo | Cabeçalho e botão do menu | Destino listado no painel |
+| --- | --- | --- |
+| `index` — acesso | Não exibir o menu lateral nem seu botão | Não |
+| Talhões | Sim, botão imediatamente à esquerda do título | Talhões |
+| Calendário | Sim, botão imediatamente à esquerda do título | Calendário |
+| Insumos | Sim, botão imediatamente à esquerda do título | Insumos |
+| Planos de manejo | Sim, botão imediatamente à esquerda do título | Planos de manejo |
+| Configurações | Sim, botão imediatamente à esquerda do título | Configurações |
+| Criação de talhão e de plano | Sim, como nas demais telas internas | Não; acessar pelos botões em Talhões e Planos |
+| Detalhes, edição e demais telas internas, atuais ou futuras | Sim; única exceção de tela é `index` | Não automaticamente; manter somente as cinco áreas principais |
+
+**Comportamento acordado:**
+
+- O cabeçalho permanece visível durante a rolagem. Exibir o ícone de menu à esquerda e, imediatamente ao lado, o título da tela atual, como “Criar talhão”; não substituir o título apenas pelo nome do aplicativo.
+- Tocar no botão abre o painel pela lateral esquerda, sobre o conteúdo, sem estreitar a tela ao fundo. Exibir os cinco destinos com ícones e rótulos completos, na ordem Talhões, Calendário, Insumos, Planos de manejo e Configurações.
+- Selecionar um destino fecha o painel e navega para a área escolhida. Tocar na área já ativa fecha o painel sem duplicar a rota. Destacar a seleção também por texto/peso ou forma, não apenas pela cor; telas de criação e detalhes mantêm a indicação de sua área de origem.
+- Fechar pelo botão de fechar, pelo toque fora do painel ou pelo botão Voltar do Android. Com o painel aberto, Voltar primeiro fecha o painel; com ele fechado, respeita o histórico da tela.
+- Criar talhão continua acessível por “Adicionar talhão” em Talhões; Criar plano, por botão correspondente em Planos. Essas telas possuem o botão do menu, mas não são itens do painel.
+- Preservar uma ação explícita de retorno nas telas secundárias sem retirar o menu nem inserir outro controle entre ele e o título. Definir sua posição na atividade 5.2. Antes de permitir sair de um formulário alterado, definir e verificar o tratamento de rascunho ou confirmação de descarte; não perder dados silenciosamente.
+- Compartilhar o cabeçalho e o painel pelo layout, mantendo os componentes fora de `src/app/`. Não copiar uma implementação independente em cada tela. A seleção local de perfil continua com suas regras existentes; o menu não representa autenticação remota.
+- Respeitar áreas seguras, tema claro, fonte ampliada e alvo de toque mínimo de 48 × 48. Anunciar “Abrir menu de navegação” e o estado aberto/fechado; ao abrir, levar o foco ao painel e impedir interação com o fundo; ao fechar sem navegar, devolver o foco ao botão. Permitir rolagem do painel quando os itens não couberem.
 
 **Pequenas atividades:**
 
-1. **5.1 — Definir o plano:** descrever dados e regras com um exemplo de teste, sem inserir planos padrão em perfis reais.
-2. **5.2 — Cadastrar a estrutura:** salvar e consultar um plano inicialmente vazio.
-3. **5.3 — Incluir atividades:** adicionar descrição e datas conforme contrato; validar fim igual ou posterior ao início.
-4. **5.4 — Revisar alterações:** permitir ajustes autorizados e preservar as revisões previstas.
+1. **5.1 — Mapear destinos e telas:** conferir os nomes reais das rotas, associar as cinco áreas aos destinos e separar presença do botão de presença no painel. Registrar `index` como única exceção de tela.
+2. **5.2 — Preparar o cabeçalho:** implementar o botão imediatamente à esquerda do título em um layout compartilhado. Verificar título, posição fixa, áreas seguras e ação de retorno em uma tela principal e uma secundária.
+3. **5.3 — Construir o painel:** apresentar as cinco áreas com seleção, abertura e fechamento acessíveis, aplicando o tema existente. Não incluir itens de criação.
+4. **5.4 — Integrar a navegação:** ligar os destinos, fechar o painel após a escolha e evitar duplicação de rota. Aplicar a todas as telas internas, inclusive criação e detalhes, e retirar o menu inferior. Verificar os botões de criação dentro de Talhões e Planos e o tratamento de saída de formulários alterados.
+5. **5.5 — Validar a experiência:** percorrer todas as telas existentes, testar retorno Android, seleção de área, abertura/fechamento, teclado, fonte ampliada, tela estreita e TalkBack. Executar lint e typecheck e registrar resultados, limitações e próximo exercício.
 
-**Critérios de conclusão:** planos pertencem ao produtor, persistem e tratam intervalos inválidos. Datas não mudam de dia por conversão indevida de fuso.
+**Critérios de conclusão:** `index` sem menu; todas as telas internas com botão imediatamente à esquerda do título; painel com somente cinco áreas; cadastros acessíveis dentro de suas áreas; nenhum menu inferior remanescente; navegação sem duplicação, retorno funcional e saída de formulários sem perda silenciosa. Conferir acessibilidade e comportamento no Android antes de declarar a implementação concluída.
 
-**Perguntas de revisão:** qual a diferença entre plano e execução? Por que uma data de plantio não é necessariamente um instante com horário e fuso?
+**Perguntas de revisão:** por que uma tela pode ter o botão do menu sem aparecer entre seus destinos? Qual a diferença entre abrir uma área e criar um registro? Como o layout evita repetir cabeçalhos? O que deve acontecer ao pressionar Voltar com o painel aberto?
+
+**Registro desta atualização:** atividade documental de 05/11/2026; aprendizado: distinguir destinos do painel, telas que exibem o botão e ações de criação. Próximo exercício: iniciar 5.1, conferindo as rotas atuais. Nenhuma implementação do menu ou instalação de biblioteca realizada nesta atualização. Verificações: referência PNG presente; conteúdo anterior ao módulo 5 e do módulo 6 em diante preservado integralmente, conferido por hash. Lint sem erros, com seis avisos existentes de imports não utilizados. Typecheck bloqueado pelo TS7016 já registrado em `eslint.config.js:3`; isso não valida nem conclui a futura implementação do menu.
 
 ## Módulo 6 — Atividades dos talhões
 
