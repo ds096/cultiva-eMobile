@@ -2,6 +2,14 @@
 
 ## Como usar esta trilha
 
+### Progresso da atividade 4.3.1 e próximas telas — 05/11/2026
+
+- Atividade documental: o responsável confirmou a conclusão da **4.3.1**. O módulo 4 permanece em andamento; a criação em `createPlot` será desenvolvida na atividade 4.3.2. A tela `[id]` fica adiada para a atividade 9.3, pois apresentará o histórico das atividades realizadas no talhão, após a implementação de atividades e lançamentos.
+- Este status prevalece sobre o registro anterior “Consulta de detalhes do talhão”: aquele registro descreve uma intervenção anterior, não a conclusão da tela nem sua validação pelo responsável.
+- Aprendizado: separar listagem, consulta de um registro e criação permite desenvolver e verificar uma pequena parte por vez. Concluir a 4.3.1 não conclui todo o fluxo de talhões.
+- Verificações desta atualização documental: lint sem erros, com seis avisos de imports `Menu` não utilizados; typecheck bloqueado pelo TS7016 preexistente em `eslint.config.js:3`. Conferência do diff sem erros de espaços. Nenhuma tela implementada ou dependência instalada nesta atividade; testes em aparelho não realizados.
+- Próximo exercício: preparar o formulário `createPlot` na atividade 4.3.2, confirmando campos, unidades e regras pendentes. A tela `[id]` será desenvolvida mais adiante, no módulo 9; não é requisito para concluir o módulo 4.
+
 ### Padronização dos nomes — 05/11/2026
 
 - Atividade: renomeado o arquivo atual `plotsScreen.tsx` para `plots.tsx`, preservando seu conteúdo e atualizando menu, redirecionamento e registro protegido para `/plots`. Componentes de tela usam `Screen`: `PlotsScreen`, `PlotDetailsScreen`, `CreatePlotScreen`, `PlansScreen`, `CreatePlanScreen`, `CalendarScreen`, `SuppliesScreen`, `SettingsScreen` e `AccessScreen`.
@@ -104,7 +112,7 @@ Um módulo agrupa várias atividades; não é uma tarefa para executar de uma ve
 | 1. Fundamentos e estrutura   | Compreender responsabilidades e fluxo de dados         | Concluído pelo responsável; confirmado em 23/10/2026 |
 | 2. Base visual e navegação   | Preparar componentes e caminhos entre telas            | Concluído pelo responsável; confirmado em 23/10/2026 |
 | 3. Acesso por perfil local   | Selecionar e restaurar um perfil local                 | Concluído por decisão do responsável em 28/10/2026   |
-| 4. Persistência e talhões    | Manter cadastros e revisões no dispositivo             | Pendente                                             |
+| 4. Persistência e talhões    | Manter cadastros e revisões no dispositivo             | Em andamento; 4.3.1 concluída pelo responsável em 05/11/2026; detalhes e criação pendentes |
 | 5. Planos de manejo          | Criar modelos próprios de atividades                   | Pendente                                             |
 | 6. Atividades dos talhões    | Importar cópias e organizar o planejamento             | Pendente                                             |
 | 7. Insumos e cálculos        | Cadastrar aquisições e definir cálculos confiáveis     | Pendente                                             |
@@ -284,10 +292,25 @@ Tratar os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) em pequenas 
 
 1. **4.1 — Definir o contrato:** acordar os dados de um talhão e exemplos de entradas válidas e inválidas.
 2. **4.2 — Salvar e reler:** ampliar o repositório local sem acoplar a tela ao formato interno de armazenamento.
-3. **4.3 — Cadastrar e consultar:** implementar formulário, lista e detalhes em atividades separadas.
+3. **4.3 — Cadastrar e listar:** implementar formulário e lista em atividades separadas. A consulta ao histórico em `[id]` fica para o módulo 9.
 4. **4.4 — Editar com revisão:** mostrar versão atual e preservar versões anteriores; testar falha de gravação sem apagar dados.
 
-**Critérios de conclusão:** cadastros sobrevivem ao reinício, pertencem ao perfil correto e edições preservam histórico. Estados vazio, inválido e erro são compreensíveis. Não acrescentar cadastro de propriedades.
+### Etapas da atividade 4.3
+
+**4.3.1 — Etapa concluída:** conclusão informada pelo responsável em 05/11/2026. Esse registro não inclui a conclusão das telas `[id]` e `createPlot` e não representa nova validação técnica ou em aparelho.
+
+**4.3.2 — Criar talhão em `createPlot` — a desenvolver:**
+
+- Conferir o contrato existente antes do formulário: obrigatoriedade, unidade e precisão da área, culturas e quantidades, ano e coordenadas opcionais. Resolver divergências e regras pendentes antes de implementar entradas ou conversões.
+- Abrir a tela pela ação “Adicionar talhão” da lista. Construir campos com rótulos persistentes, indicação de opcionais, mensagens de validação e suporte a teclado, rolagem e fonte ampliada.
+- Manter o preenchimento separado do registro salvo. Validar pelas regras do domínio e criar identidade estável e primeira revisão pelo fluxo de persistência, vinculadas ao perfil local ativo.
+- Preparar estados de validação, salvamento e falha; preservar os valores quando houver erro e impedir cadastros duplicados por toques repetidos. Confirmar sucesso apenas após a gravação local, sem afirmar sincronização.
+- Definir o destino após salvar e atualizar a lista para apresentar o novo talhão. Acordar o comportamento de Voltar ou sair com alterações não salvas, sem presumir persistência de rascunho nem perder preenchimento silenciosamente.
+- Verificar entrada válida, campos inválidos, opcionais, falha de gravação, repetição de toque, saída do formulário e permanência após reiniciar o aplicativo, usando perfil de teste separado.
+
+**Questões para `createPlot`:** quais campos são obrigatórios? Como informar unidade e aceitar valores decimais conforme o contrato? Como incluir culturas e suas quantidades? Quando um cadastro passa a existir? O que acontece se salvar falhar ou o produtor tocar duas vezes? Para onde navegar após salvar e como tratar a saída sem salvar?
+
+**Critérios de conclusão:** formulário `createPlot` e listagem desenvolvidos e verificados; cadastros sobrevivem ao reinício, pertencem ao perfil correto e edições preservam histórico. Estados vazio, inválido, carregamento, salvamento e erro são compreensíveis. Não acrescentar cadastro de propriedades. A conclusão da 4.3.1, isoladamente, não conclui o módulo 4. A tela `[id]` não faz parte dos critérios deste módulo; será desenvolvida na atividade 9.3.
 
 **Perguntas de revisão:** por que um nome não é um bom identificador? Como diferenciar a versão atual de uma revisão? O que ocorre se a gravação falhar?
 
@@ -420,8 +443,22 @@ Tratar os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) em pequenas 
 
 1. **9.1 — Definir o contrato de fotos:** acordar arquivos e referências esperados, cancelamento e falha de salvamento.
 2. **9.2 — Anexar antes de salvar:** preparar arquivos persistentes e permitir ajustes apenas no formulário ainda não salvo.
-3. **9.3 — Consultar o histórico:** listar execuções e abrir detalhes com custos, insumos e fotos originais.
+3. **9.3 — Desenvolver `[id]` para consultar o histórico do talhão:** apresentar as atividades realizadas e permitir abrir os detalhes de seus lançamentos, com custos, insumos e fotos originais, somente para leitura. Desenvolver após os módulos de atividades e lançamento único, conforme detalhamento abaixo.
 4. **9.4 — Conferir permanência:** reiniciar o app e acessar offline; testar permissão negada e arquivo indisponível com mensagem compreensível.
+
+### Atividade 9.3 — Tela `[id]` adiada para o histórico
+
+**Estado:** a desenvolver, por decisão do responsável em 05/11/2026. Esta tela pertence à etapa posterior de consulta do trabalho realizado, e não ao cadastro inicial de talhões do módulo 4.
+
+- Entrada: identificador do talhão selecionado e perfil local ativo. Consultar pelo repositório somente os dados desse perfil; não criar registros ou revisões ao abrir a tela.
+- Resultado: identificar o talhão e apresentar seu histórico de atividades realizadas, com acesso aos lançamentos correspondentes. Distinguir os dados atuais do talhão dos dados históricos preservados em cada execução.
+- Definir antes de implementar a ordem do histórico, os dados resumidos em cada item e a navegação para os detalhes do lançamento. Não misturar atividades planejadas ainda em aberto com execuções realizadas.
+- Preparar carregamento, histórico vazio, identificador inválido, talhão não encontrado e falha de leitura com nova tentativa. Ausência de histórico não equivale a erro de leitura.
+- Conectar o acesso a partir da lista de talhões e prever retorno. Aplicar tema compartilhado, menu do módulo 5, áreas seguras, rolagem, fonte ampliada e TalkBack.
+- Preservar a consulta sem edição dos dados e fotos dos lançamentos desde o salvamento local, inclusive quando houver envio pendente no futuro. Não afirmar sincronização sem backend.
+- Verificar talhão correto, separação entre perfis, histórico vazio e preenchido, consulta após reinício e sem conexão, dados históricos após alterações de cadastros e retorno no Android. Usar registros de teste separados de perfis reais.
+
+**Questões para `[id]`:** quais informações permitem reconhecer uma atividade realizada? Em que ordem apresentar as execuções? Como abrir um lançamento e voltar ao histórico? Como diferenciar dados atuais do talhão de informações preservadas no lançamento? Como mostrar ausência de execuções, falha de leitura e foto indisponível? Como garantir que a consulta não permita alterar o histórico?
 
 **Critérios de conclusão:** lançamentos sem foto continuam válidos; fotos sobrevivem ao reinício; insumos esgotados continuam visíveis no histórico. Não anexar ou substituir fotos de lançamento já salvo sob pretexto de completar o módulo.
 
