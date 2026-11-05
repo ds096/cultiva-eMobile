@@ -1,27 +1,112 @@
-import { View } from "react-native";
-import { Text } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
-import Menu from "../components/Menu";
-import { theme, tokens } from "../theme/theme";
+import { useState, useCallback } from "react";
+import { FlatList, View, Text, Pressable, StyleSheet } from "react-native";
+import { useFocusEffect, router } from "expo-router";
+import { Plot, getCurrentRevision } from "../domain/plot";
+import { useProfile } from "../context/ProfileContext";
+import { plotRepository } from "../repositories/plotRepository";
 
-// Tela provisória: centraliza o aviso na área disponível acima do menu fixo.
-export default function Settings() {
+type LoadStatus = "loading" | "ready" | "error";
+
+export default function PlotsScreen() {
+  const [status, setStatus] = useState<LoadStatus>("loading");
+  const [plots, setPlots] = useState<Plot[]>([]);
+  const { email } = useProfile();
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!email) {
+        setPlots([]);
+        setStatus("ready");
+        return;
+      }
+
+      setStatus("loading");
+
+      try {
+        const data = plotRepository.list(email);
+        setPlots(data);
+        setStatus("ready");
+      } catch {
+        setPlots([]);
+        setStatus("error");
+      }
+    }, [email]),
+  );
+
+  if (status === "loading") {
+    return <Text>Carregando talhões...</Text>;
+  }
+
+  if (status === "error") {
+    return <Text>Erro ao carregar talhões.</Text>;
+  }
+
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <SafeAreaView
-        edges={["top", "left", "right"]}
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          padding: tokens.space.lg,
-        }}
-      >
-        <Text variant="bodyLarge" style={{ textAlign: "center" }}>
-          Tela em desenvolvimento
-        </Text>
-      </SafeAreaView>
-      {/* Fora da área central, o menu reserva seu espaço e respeita a barra do sistema. */}
-    </View>
+    <FlatList
+      data={plots}
+      keyExtractor={(item) => item.id}
+      contentContainerStyle={styles.list}
+      ListHeaderComponent={
+        <Pressable
+          onPress={() => router.push("/createPlot")}
+          style={{
+            backgroundColor: "#2E7D32",
+            padding: 14,
+            borderRadius: 8,
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ color: "#FFFFFF", fontWeight: "600" }}>
+            + Adicionar talhão
+          </Text>
+        </Pressable>
+      }
+
+      renderItem={({ item }) => (
+        <View style={styles.card}>
+          <Text style={styles.title}>{getCurrentRevision(item).data.name}</Text>
+
+          <Pressable
+            style={styles.button}
+            onPress={() =>
+              router.push({
+                pathname: "/plot/[id]",
+                params: { id: item.id },
+              })
+            }
+          >
+            <Text>Ver Detalhes</Text>
+          </Pressable>
+        </View>
+      )}
+      ListEmptyComponent={
+        <Text>Você ainda não possui talhões cadastrados.</Text>
+      }
+    />
   );
 }
+
+const styles = StyleSheet.create({
+  list: {
+    padding: 16,
+    gap: 12,
+  },
+  card: {
+    borderWidth: 1,
+    borderColor: "#CCCCCC",
+    borderRadius: 12,
+    padding: 16,
+    gap: 12,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  button: {
+    alignSelf: "flex-start",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#CCCCCC",
+    borderRadius: 8,
+  },
+});

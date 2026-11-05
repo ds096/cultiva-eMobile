@@ -3,10 +3,10 @@ import { ScrollView, View } from "react-native";
 import { Text } from "react-native-paper";
 import { AppButton } from "../components/AppButton";
 import Menu from "../components/Menu";
-import { useProfile } from "../context/PerfilContext";
+import { useProfile } from "../context/ProfileContext";
 import { theme } from "../theme/theme";
 
-export default function Plots() {
+export default function SettingsScreen() {
   // A operação atualiza armazenamento e estado compartilhado.
   const { clearProfile } = useProfile();
 

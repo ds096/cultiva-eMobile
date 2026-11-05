@@ -5,7 +5,7 @@ import Menu from "../components/Menu";
 import { theme, tokens } from "../theme/theme";
 
 // Tela provisória: centraliza o aviso na área disponível acima do menu fixo.
-export default function Plans() {
+export default function PlansScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <SafeAreaView

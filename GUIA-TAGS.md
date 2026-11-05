@@ -82,7 +82,42 @@ Pode utilizar uma altura fixa ou `flex: 1` para ocupar o espaço disponível.
 
 **Exemplo de uso:** Lista de talhões, atividades e histórico de lançamentos.
 
+**Como escrever:** `<FlatList />`, com `F` e `L` maiúsculos, importado de `react-native`.
+
+**Exemplo comentado (TypeScript):**
+
+```tsx
+// FlatList controla a lista; Text apresenta o nome de cada registro.
+import { FlatList } from 'react-native';
+import { Text } from 'react-native-paper';
+
+// Contrato mínimo apenas para demonstrar a apresentação da lista.
+type ItemTalhao = { id: string; nome: string };
+
+// Recebe dados do chamador, sem criar ou gravar registros fictícios.
+export function ListaTalhoes({ talhoes }: { talhoes: ItemTalhao[] }) {
+  return (
+    <FlatList
+      // A entrada é o array de registros que serão apresentados.
+      data={talhoes}
+      // Use um identificador único e estável, evitando o índice da posição.
+      keyExtractor={(item) => item.id}
+      // item é um registro do array; a função devolve seu conteúdo visual.
+      renderItem={({ item }) => <Text>{item.nome}</Text>}
+      // Com um array vazio, a lista apresenta esta orientação.
+      ListEmptyComponent={<Text>Você ainda não possui talhões cadastrados.</Text>}
+    />
+  );
+}
+```
+
+**Resultado esperado:** Um nome por item, ou a mensagem de lista vazia quando `talhoes` for `[]`. O tipo deste exemplo é didático; a integração com o domínio deve respeitar o contrato real de talhões.
+
 **Diferença para ScrollView:** A `FlatList` utiliza virtualização para renderizar principalmente os elementos necessários à visualização, melhorando o desempenho de listas grandes.
+
+**Referência:** [FlatList — documentação oficial do React Native](https://reactnative.dev/docs/flatlist).
+
+**Registro de estudo — 05/11/2026:** Seção existente ampliada com sintaxe e exemplo comentado. Aprendizado: relacionar `data`, `renderItem`, chave estável e estado vazio. Verificações do projeto: lint sem erros e com 11 avisos; typecheck bloqueado pelo TS7016 já registrado em `eslint.config.js:3`. O exemplo documental não foi executado em aparelho. Próximo exercício: identificar o resultado para uma lista vazia e para uma lista com registros, sem gravar dados de teste em perfis reais.
 
 ## 4. SafeAreaView
 

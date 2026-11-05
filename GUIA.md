@@ -2,6 +2,33 @@
 
 ## Como usar esta trilha
 
+### Padronização dos nomes — 05/11/2026
+
+- Atividade: renomeado o arquivo atual `plotsScreen.tsx` para `plots.tsx`, preservando seu conteúdo e atualizando menu, redirecionamento e registro protegido para `/plots`. Componentes de tela usam `Screen`: `PlotsScreen`, `PlotDetailsScreen`, `CreatePlotScreen`, `PlansScreen`, `CreatePlanScreen`, `CalendarScreen`, `SuppliesScreen`, `SettingsScreen` e `AccessScreen`.
+- Contexto e repositório passaram a `src/context/ProfileContext.tsx` e `src/repositories/profileRepository.ts`, com símbolos e imports correspondentes atualizados. As strings persistidas `cultiva-e-perfil` e `perfil.email` foram preservadas.
+- Aprendizado: o arquivo define o endereço no Expo Router; o nome do componente identifica a tela no código. Renomear símbolos não exige renomear chaves de armazenamento. Os nomes antigos nos registros datados abaixo descrevem o estado daquela entrega.
+- Verificações: lint sem erros, com seis avisos preexistentes de `Menu` não utilizado; typecheck continua bloqueado apenas pelo TS7016 em `eslint.config.js:3`. Conferência das referências em `src` não encontrou nomes antigos; `git diff --check` sem erros. Nenhuma dependência instalada.
+- Próximo exercício: conferir entrada, menu Talhões e detalhes no Android após as renomeações. Teste em aparelho continua pendente; esta atividade não conclui o módulo 4.
+
+### Consulta de detalhes do talhão — 05/11/2026
+
+- Atividade 4.3: implementada `src/app/plot/[id].tsx`, com `useLocalSearchParams`, perfil de `useProfile` e consulta `plotRepository.findById(email, id)`. O método foi acrescentado reutilizando `list`, preservando validação, separação por perfil e propagação de falhas.
+- Aprendizado: a rota transporta apenas a identidade; `getCurrentRevision` seleciona a última revisão na ordem do histórico, conforme o domínio existente. A tela mostra nome, área, culturas com quantidades e, quando presentes, ano e coordenadas, incluindo zero. A unidade da área não foi presumida, pois não está definida no contrato atual.
+- Interface: consulta ao receber foco, carregamento, não encontrado e erro com nova tentativa; tema compartilhado, rolagem e áreas seguras. Não há escrita de dados ou histórico nesta atividade.
+- Navegação: detalhes incluídos em `Stack.Protected` com perfil selecionado. Referências à antiga rota `plots` foram alinhadas ao arquivo atual `plotsScreen.tsx`, preservando sua renomeação em andamento. Removido o import inexistente `rout` da lista. A proteção é local e não comprova identidade nem autoriza acesso remoto.
+- Verificações: lint terminou com zero erros e seis avisos preexistentes de `Menu` não utilizado. Typecheck encontrou somente o TS7016 preexistente em `eslint.config.js:3`. Nove verificações isoladas em memória passaram, cobrindo ausência, revisão atual, coordenada zero, opcionais ausentes, id inexistente, separação por perfil, preservação do documento, JSON inválido e falha de leitura. Nenhuma dependência instalada ou dado real alterado.
+- Bloqueios e próximo exercício: resolver o diagnóstico de tipos em atividade própria; conectar o botão da lista aos detalhes e conferir em Android a consulta, retorno, acesso direto sem perfil, fonte ampliada e TalkBack. A lista atual ainda exibe somente nomes. Validação visual e MMKV real não realizados; módulo 4 continua pendente.
+- Referências consultadas: [parâmetros de rota](https://docs.expo.dev/router/reference/url-parameters/) e [rotas protegidas](https://docs.expo.dev/router/advanced/protected/) do Expo Router, após conferir o SDK 58 instalado.
+
+### Leitura validada dos talhões — 02/11/2026
+
+- Atividade 4.2: atualizado `src/repositories/plotRepository.ts`, mantido como `.ts` porque não contém JSX. Preservados a instância `cultiva-e-talhoes`, as chaves por e-mail e o padrão de inicialização sob demanda do `perfilRepository`; a seleção de perfil continua separada dos documentos de talhões.
+- Aprendizado: `readRaw` lê texto; somente chave ausente retorna lista vazia. `JSON.parse` verifica sintaxe, enquanto as verificações seguintes conferem documento, `schemaVersion: 1`, lista, perfil normalizado, identidade e todas as revisões. Objetos tipados são construídos após validar os campos, sem `as Plot[]`.
+- Dados de cada revisão seguem o contrato atual de `normalizePlotInput`, inclusive a exigência atual de ao menos uma cultura (o registro de 30/10 descreve uma versão anterior). A leitura valida sem reescrever textos históricos, ordenar revisões, gravar ou apagar dados. Versão da revisão deve ser inteiro positivo seguro e `savedAt` uma string interpretável como data.
+- Verificações: 28 cenários em memória passaram, incluindo ausência, documento vazio válido, normalização de e-mail, JSON inválido, perfil divergente, revisões e dados inválidos, opcionais válidos e falha de leitura. MMKV real e aparelho não foram acessados. Lint: zero erros e sete avisos preexistentes de `Menu` não utilizado. Typecheck: bloqueado pelo TS7016 preexistente em `eslint.config.js:3`, sem diagnóstico no arquivo alterado.
+- Próximo exercício: acompanhar um documento válido e outro inválido pelas etapas de `list()`. Gravação e integração com telas continuam para atividades posteriores; o módulo 4 não está concluído.
+- Complemento de 02/11/2026: comentários do repositório ampliados a pedido do responsável, explicando `unknown`, refinamento de tipos, `ReturnType`, `map`, opcionais, propagação de erros e a diferença entre estrutura e regra de negócio. Apenas comentários alterados; próximo exercício e bloqueio de TypeScript permanecem os mesmos.
+
 ### Contrato e validações de talhões — 30/10/2026
 
 - Atividade 4.1: preenchido `src/domain/plot.ts`, que estava vazio, com os tipos da aula (`Crop`, `Coordinates`, `PlotInput`, `PlotRevision` e `Plot`) e funções de validação. Nome, área e lista de culturas são obrigatórios; ano e localização são opcionais. Dados editáveis permanecem dentro das revisões.

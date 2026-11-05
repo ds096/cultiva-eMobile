@@ -4,8 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Menu from "../components/Menu";
 import { theme, tokens } from "../theme/theme";
 
-// Tela provisória de Insumos (/supplies): centraliza o aviso acima do menu fixo.
-export default function Supplies() {
+// Tela provisória de criação de talhão, correspondente à rota /createPlot.
+export default function CreatePlotScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <SafeAreaView

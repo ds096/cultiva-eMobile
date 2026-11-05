@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
-import { perfilRepository } from "../repositories/perfilRepository";
+import { profileRepository } from "../repositories/profileRepository";
 
 // Preserva o contrato consumido pelo layout atual.
 type RestorationStatus = "loading" | "ready" | "error";
@@ -12,7 +12,7 @@ type ProfileState = {
 };
 
 // Define os dados e as operações compartilhados com as telas.
-type PerfilContextType = {
+type ProfileContextType = {
   email: string | null;
   restorationStatus: RestorationStatus;
   restoreProfile: () => void;
@@ -21,13 +21,13 @@ type PerfilContextType = {
 };
 
 // O valor padrão denuncia a ausência do provedor.
-const PerfilContext = createContext<PerfilContextType | null>(null);
+const ProfileContext = createContext<ProfileContextType | null>(null);
 
 // Consulta o armazenamento sem gravar nem apagar dados de perfil.
 function readProfile(): ProfileState {
   try {
     return {
-      email: perfilRepository.get(),
+      email: profileRepository.get(),
       restorationStatus: "ready",
     };
   } catch {
@@ -48,29 +48,29 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
   // Só publica a nova seleção depois de conseguir persistir.
   function selectProfile(novoEmail: string) {
-    perfilRepository.save(novoEmail);
+    profileRepository.save(novoEmail);
     setProfile({ email: novoEmail, restorationStatus: "ready" });
   }
 
   // Só confirma a saída depois de remover a seleção persistida.
   function clearProfile() {
-    perfilRepository.remove();
+    profileRepository.remove();
     setProfile({ email: null, restorationStatus: "ready" });
   }
 
   // Compartilha o estado e as ações com os componentes descendentes.
   return (
-    <PerfilContext.Provider
+    <ProfileContext.Provider
       value={{ ...profile, restoreProfile, selectProfile, clearProfile }}
     >
       {children}
-    </PerfilContext.Provider>
+    </ProfileContext.Provider>
   );
 }
 
 // Centraliza a leitura e exige o provedor correspondente.
 export function useProfile() {
-  const contexto = useContext(PerfilContext);
+  const contexto = useContext(ProfileContext);
   if (!contexto) {
     throw new Error("useProfile precisa de ProfileProvider");
   }

@@ -15,12 +15,12 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { AppButton } from "../components/AppButton";
-import { useProfile } from "../context/PerfilContext";
+import { useProfile } from "../context/ProfileContext";
 import { theme, tokens } from "../theme/theme";
 import { normalizeEmail, validateEmail } from "../utilities/email";
 
 // Seleciona um perfil local sem comprovar a identidade do produtor.
-export default function Access() {
+export default function AccessScreen() {
   const { selectProfile } = useProfile();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();

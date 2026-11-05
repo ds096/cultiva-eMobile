@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 
 import { theme } from "../theme/theme";
 import { AppButton } from "../components/AppButton";
-import { ProfileProvider, useProfile } from "../context/PerfilContext";
+import { ProfileProvider, useProfile } from "../context/ProfileContext";
 import { ActivityIndicator, PaperProvider, Text } from "react-native-paper";
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -55,10 +55,16 @@ function Navigation() {
       {/* Ao sair, a seleção é removida e a navegação retorna à tela de acesso. */}
       <Stack.Protected guard={!!email} redirectTo="/">
         <Stack.Screen name="plots" options={{ title: "Meus Talhões" }} />
-        <Stack.Screen name="calendar" options={{ headerShown: false }} />
-        <Stack.Screen name="supplies" options={{ headerShown: false }} />
-        <Stack.Screen name="plans" options={{ headerShown: false }} />
-        <Stack.Screen name="settings" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="plot/[id]"
+          options={{ title: "Detalhes do talhão" }}
+        />
+        <Stack.Screen name="calendar" options={{ title: "Calendário" }} />
+        <Stack.Screen name="supplies" options={{ title: "Insumos" }} />
+        <Stack.Screen name="plans" options={{ title: "Planos de Atividade" }} />
+        <Stack.Screen name="settings" options={{ title: "Configurações" }} />
+        <Stack.Screen name="createPlan" options={{ title: "Criar Plano" }} />
+        <Stack.Screen name="createPlot" options={{ title: "Criar Talhão" }} />
       </Stack.Protected>
 
       {!!email && <Menu />}

@@ -4,7 +4,8 @@ type Storage = ReturnType<typeof createMMKV>;
 
 let storage: Storage | null = null;
 
-const PERFIL_KEY = "perfil.email";
+// O nome do código muda, mas a chave persistida mantém os perfis já salvos.
+const PROFILE_KEY = "perfil.email";
 
 // Cria o armazenamento apenas quando alguma operação precisar dele.
 function getStorage(): Storage {
@@ -19,19 +20,19 @@ function getStorage(): Storage {
   return storage;
 }
 
-export const perfilRepository = {
+export const profileRepository = {
   // Persiste a seleção no armazenamento compartilhado.
   save(email: string): void {
-    getStorage().set(PERFIL_KEY, email);
+    getStorage().set(PROFILE_KEY, email);
   },
 
   // Retorna null somente quando a leitura termina sem encontrar seleção.
   get(): string | null {
-    return getStorage().getString(PERFIL_KEY) ?? null;
+    return getStorage().getString(PROFILE_KEY) ?? null;
   },
 
   // Remove apenas a seleção atual.
   remove(): void {
-    getStorage().remove(PERFIL_KEY);
+    getStorage().remove(PROFILE_KEY);
   },
 };

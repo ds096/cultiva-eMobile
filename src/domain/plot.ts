@@ -1,3 +1,48 @@
+// {
+//   "id": "plot-001",
+//   "profileEmail": "produtor@email.com",
+//   "revisions": [
+//     {
+//       "version": 1,
+//       "savedAt": "2026-11-01T10:00:00.000Z",
+//       "data": {
+//         "name": "Talhão Norte",
+//         "area": 2.5,
+//         "crops": [
+//           {
+//             "name": "Café Conilon",
+//             "quantity": 5000
+//           }
+//         ],
+//         "plantingYear": 2022,
+//         "location": {
+//           "latitude": -21.06,
+//           "longitude": -41.37
+//         }
+//       }
+//     },
+//     {
+//       "version": 2,
+//       "savedAt": "2026-11-03T14:30:00.000Z",
+//       "data": {
+//         "name": "Talhão Norte - Café",
+//         "area": 2.5,
+//         "crops": [
+//           {
+//             "name": "Café Conilon",
+//             "quantity": 5200
+//           }
+//         ],
+//         "plantingYear": 2022,
+//         "location": {
+//           "latitude": -21.06,
+//           "longitude": -41.37
+//         }
+//       }
+//     }
+//   ]
+// }
+
 // Cada cultura registra sua própria quantidade de plantas.
 export type Crop = Readonly<{
   name: string;
@@ -45,7 +90,7 @@ export function normalizePlotName(name: string): string {
 // Rejeita zero, negativos, NaN e infinitos antes de usar a área.
 export function validatePlotArea(area: number): number {
   if (!Number.isFinite(area) || area <= 0) {
-    throw new Error("Informe uma área finita maior que zero.");
+    throw new Error("Informe uma área maior que zero.");
   }
   return area;
 }
@@ -86,6 +131,7 @@ export function validatePlantingYear(year: number): number {
   return year;
 }
 
+// Função unificadora das vaidaçõoes
 export function normalizePlotInput(input: PlotInput): PlotInput {
   const name = normalizePlotName(input.name);
 
@@ -116,7 +162,6 @@ export function normalizePlotInput(input: PlotInput): PlotInput {
 }
 
 // O histórico segue a ordem de criação; consultar não ordena nem altera revisões.
-
 export function getCurrentRevision(plot: Plot): PlotRevision {
   const lastItem = plot.revisions.at(-1);
   if (!lastItem) {

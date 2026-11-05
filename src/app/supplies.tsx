@@ -5,7 +5,7 @@ import Menu from "../components/Menu";
 import { theme, tokens } from "../theme/theme";
 
 // Tela provisória de Insumos (/supplies): centraliza o aviso acima do menu fixo.
-export default function Supplies() {
+export default function SuppliesScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <SafeAreaView
