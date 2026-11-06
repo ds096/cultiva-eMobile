@@ -21,7 +21,6 @@ export default function PlansScreen() {
           Tela em desenvolvimento
         </Text>
       </SafeAreaView>
-      {/* Fora da área central, o menu reserva seu espaço e respeita a barra do sistema. */}
     </View>
   );
 }

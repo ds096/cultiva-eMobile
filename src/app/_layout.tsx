@@ -1,12 +1,9 @@
 import { Stack } from "expo-router";
-
 import { theme } from "../theme/theme";
-import { AppButton } from "../components/AppButton";
 import { ProfileProvider, useProfile } from "../context/ProfileContext";
 import { ActivityIndicator, PaperProvider, Text } from "react-native-paper";
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Menu from "../components/Menu";
 
 // Define a disponibilidade das telas a partir da seleção local de perfil.
 function Navigation() {
@@ -36,9 +33,6 @@ function Navigation() {
               <Text accessibilityRole="alert">
                 Não foi possível recuperar o perfil salvo. Tente novamente.
               </Text>
-
-              {/* Repete a leitura sem apagar a seleção persistida. */}
-              <AppButton title="Tentar novamente" onPress={restoreProfile} />
             </>
           )}
         </ScrollView>
@@ -47,12 +41,10 @@ function Navigation() {
   }
   return (
     <Stack>
-      {/* Após salvar o perfil, o destino é Talhões, independentemente da ordem das rotas. */}
       <Stack.Protected guard={!email} redirectTo="/plots">
         <Stack.Screen name="index" options={{ headerShown: false }} />
       </Stack.Protected>
 
-      {/* Ao sair, a seleção é removida e a navegação retorna à tela de acesso. */}
       <Stack.Protected guard={!!email} redirectTo="/">
         <Stack.Screen name="plots" options={{ title: "Meus Talhões" }} />
         <Stack.Screen
@@ -66,8 +58,6 @@ function Navigation() {
         <Stack.Screen name="createPlan" options={{ title: "Criar Plano" }} />
         <Stack.Screen name="createPlot" options={{ title: "Criar Talhão" }} />
       </Stack.Protected>
-
-      {!!email && <Menu />}
     </Stack>
   );
 }

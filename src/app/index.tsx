@@ -9,12 +9,11 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { Text } from "react-native-paper";
+import { Button, Text } from "react-native-paper";
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { AppButton } from "../components/AppButton";
 import { useProfile } from "../context/ProfileContext";
 import { theme, tokens } from "../theme/theme";
 import { normalizeEmail, validateEmail } from "../utilities/email";
@@ -125,11 +124,17 @@ export default function AccessScreen() {
                 {erro}
               </Text>
             )}
-            <AppButton
-              title={carregando ? "Abrindo perfil…" : "Continuar"}
+            {/* Desabilita a ação enquanto o perfil está sendo aberto. */}
+            <Button
+              mode="contained"
+              contentStyle={{ minHeight: tokens.size.button }}
+              style={{ borderRadius: tokens.radius.input }}
               onPress={handleContinue}
               loading={carregando}
-            />
+              disabled={carregando}
+            >
+              {carregando ? "Abrindo perfil." : "Continuar"}
+            </Button>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

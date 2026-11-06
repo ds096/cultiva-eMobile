@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { ScrollView, View } from "react-native";
+import { Button, ScrollView, View } from "react-native";
 import { Text } from "react-native-paper";
-import { AppButton } from "../components/AppButton";
-import Menu from "../components/Menu";
 import { useProfile } from "../context/ProfileContext";
 import { theme } from "../theme/theme";
 
@@ -30,7 +28,7 @@ export default function SettingsScreen() {
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
         {erro !== "" && <Text>{erro}</Text>}
-        <AppButton title="Sair" onPress={handleExit} />
+        <Button title="Sair" onPress={handleExit} />
       </ScrollView>
     </View>
   );

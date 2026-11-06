@@ -14,8 +14,7 @@ Este documento apresenta os principais componentes utilizados no desenvolvimento
 | Exibir imagens                         | `Image`                |
 | Exibir textos                          | `Text`                 |
 | Receber informações digitadas          | `TextInput`            |
-| Executar ações                         | `Button` / `AppButton` |
-| Exibir menu personalizado              | `Menu`                 |
+| Executar ações                         | `Button` |
 | Navegar entre telas com histórico      | `Stack`                |
 | Configurar uma tela do Stack           | `Stack.Screen`         |
 | Controlar acesso às rotas              | `Stack.Protected`      |
@@ -214,9 +213,9 @@ export function ListaTalhoes({ talhoes }: { talhoes: ItemTalhao[] }) {
 
 **Observação:** O teclado numérico não garante que o valor seja válido. Seletores de datas e opções geralmente utilizam componentes específicos.
 
-## 9. Button / AppButton
+## 9. Button
 
-**Origem:** React Native Paper / componente personalizado
+**Origem:** React Native Paper
 
 **O que é:** Componente que permite executar ações por meio de botões.
 
@@ -228,23 +227,10 @@ export function ListaTalhoes({ talhoes }: { talhoes: ItemTalhao[] }) {
 - `disabled`: desabilita a interação.
 - `loading`: apresenta indicador de carregamento, no Paper ou em implementações personalizadas.
 - `mode`: define a aparência do botão no Paper.
-- `title`: texto utilizado pelo `AppButton` personalizado do projeto.
+- `children`: texto apresentado pelo botão do Paper.
 
 **Exemplo de uso:** Botão "Salvar talhão".
 
-## 10. Menu
-
-**Origem:** Componente personalizado do cultiva-e
-
-**O que é:** Componente responsável por apresentar opções de navegação.
-
-**Qual situação resolve:** Permitir que o usuário navegue entre as principais funcionalidades do aplicativo.
-
-**Exemplo de uso:** Menu inferior com Talhões, Calendário, Insumos, Planos e Configurações.
-
-**Observação:** Quando o mesmo menu aparece em várias telas, é recomendável utilizar um layout compartilhado.
-
-O React Native Paper também possui um componente `Menu`, mas sua finalidade principal é apresentar opções em um menu suspenso.
 
 ## 11. Stack
 

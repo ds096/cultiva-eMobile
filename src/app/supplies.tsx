@@ -1,10 +1,9 @@
 import { View } from "react-native";
 import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Menu from "../components/Menu";
 import { theme, tokens } from "../theme/theme";
 
-// Tela provisória de Insumos (/supplies): centraliza o aviso acima do menu fixo.
+// Tela provisória de Insumos (/supplies): centraliza o aviso na tela.
 export default function SuppliesScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
@@ -21,7 +20,6 @@ export default function SuppliesScreen() {
           Tela em desenvolvimento
         </Text>
       </SafeAreaView>
-      {/* Fora da área central, o menu reserva seu espaço e respeita a barra do sistema. */}
     </View>
   );
 }

@@ -1,5 +1,12 @@
 import { useState, useCallback } from "react";
-import { FlatList, View, Text, Pressable, StyleSheet } from "react-native";
+import {
+  FlatList,
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  Button,
+} from "react-native";
 import { useFocusEffect, router } from "expo-router";
 import { Plot, getCurrentRevision } from "../domain/plot";
 import { useProfile } from "../context/ProfileContext";
@@ -9,8 +16,9 @@ type LoadStatus = "loading" | "ready" | "error";
 
 export default function PlotsScreen() {
   const [status, setStatus] = useState<LoadStatus>("loading");
+  const [erro, setErro] = useState("");
   const [plots, setPlots] = useState<Plot[]>([]);
-  const { email } = useProfile();
+  const { email, clearProfile } = useProfile();
 
   useFocusEffect(
     useCallback(() => {
@@ -41,25 +49,40 @@ export default function PlotsScreen() {
     return <Text>Erro ao carregar talhões.</Text>;
   }
 
+  function handleExit() {
+    setErro("");
+
+    try {
+      // Após remover a seleção, o provedor atualiza email para null.
+      clearProfile();
+    } catch {
+      // A mensagem permite compreender por que a tela permaneceu aberta.
+      setErro("Não foi possível sair do perfil. Tente novamente.");
+    }
+  }
+
   return (
     <FlatList
       data={plots}
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.list}
       ListHeaderComponent={
-        <Pressable
-          onPress={() => router.push("/createPlot")}
-          style={{
-            backgroundColor: "#2E7D32",
-            padding: 14,
-            borderRadius: 8,
-            alignItems: "center",
-          }}
-        >
-          <Text style={{ color: "#FFFFFF", fontWeight: "600" }}>
-            + Adicionar talhão
-          </Text>
-        </Pressable>
+        <>
+          <Button title="Sair" onPress={handleExit} />
+          <Pressable
+            onPress={() => router.push("/createPlot")}
+            style={{
+              backgroundColor: "#2E7D32",
+              padding: 14,
+              borderRadius: 8,
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ color: "#FFFFFF", fontWeight: "600" }}>
+              + Adicionar talhão
+            </Text>
+          </Pressable>
+        </>
       }
 
       renderItem={({ item }) => (

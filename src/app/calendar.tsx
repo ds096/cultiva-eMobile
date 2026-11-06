@@ -1,10 +1,9 @@
 import { View } from "react-native";
 import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Menu from "../components/Menu";
 import { theme, tokens } from "../theme/theme";
 
-// Tela provisória: centraliza o aviso na área disponível acima do menu fixo.
+// Tela provisória: centraliza o aviso na área disponível.
 export default function CalendarScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
@@ -21,7 +20,6 @@ export default function CalendarScreen() {
           Tela em desenvolvimento
         </Text>
       </SafeAreaView>
-      {/* Fora da área central, o menu reserva seu espaço e respeita a barra do sistema. */}
     </View>
   );
 }
