@@ -2,6 +2,7 @@
 import { createMMKV } from "react-native-mmkv";
 import { normalizeEmail } from "../utilities/email";
 import { normalizePlotInput } from "../domain/plot";
+import * as Crypto from "expo-crypto";
 import type { Crop, Plot, PlotInput, PlotRevision } from "../domain/plot";
 
 /**
@@ -26,18 +27,14 @@ import type { Crop, Plot, PlotInput, PlotRevision } from "../domain/plot";
  * list()          - Retorna os talhões do perfil.
  */
 
-// ReturnType obtém o tipo retornado por createMMKV, sem duplicar sua definição.
 type Storage = ReturnType<typeof createMMKV>;
 
 // Fora das funções, esta variável permite reutilizar a mesma instância.
 // null indica que ainda não abrimos o armazenamento, não que ele está vazio.
 let storage: Storage | null = null;
 
-// Como no profileRepository, adia a criação até alguém precisar ler os dados.
 function getStorage(): Storage {
   if (storage === null) {
-    // O id identifica o armazenamento de talhões, separado da seleção de perfil.
-    // Se createMMKV lançar um erro, storage continua null para outra tentativa.
     storage = createMMKV({
       id: "cultiva-e-talhoes",
     });
@@ -77,8 +74,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 // Recebe dados desconhecidos e devolve PlotInput somente após validá-los.
 // Primeiro conferimos a estrutura; depois aplicamos as regras do domínio.
 function readInput(value: unknown): PlotInput {
-  // || significa "ou": basta uma condição inválida para rejeitar a entrada.
-  // A avaliação para no primeiro true, evitando acessar propriedades de null.
   if (
     !isRecord(value) ||
     typeof value.name !== "string" ||
@@ -191,64 +186,53 @@ function readPlot(value: unknown, profileEmail: string): Plot {
 }
 
 export const plotRepository = {
-  // Reutiliza a leitura validada do perfil; ausência não esconde falhas de leitura.
   findById(profileEmail: string, id: string): Plot | undefined {
     return plotRepository.list(profileEmail).find((plot) => plot.id === id);
   },
 
-  // Entrada: e-mail do perfil selecionado. Saída: lista de talhões validados.
-  // O fluxo de perfil fornece o e-mail; este método não altera a seleção.
-  // Em caso de falha, lança um erro para a tela tratar, em vez de simular sucesso.
   list(profileEmail: string): Plot[] {
-    // Usamos o mesmo e-mail normalizado na chave e na comparação de cada talhão.
     const normalizedEmail = normalizeEmail(profileEmail);
-    // 1. readRaw localiza a chave e lê seu texto. Ainda não temos objetos Plot.
-    // Falhas do MMKV seguem para quem chamou list; não significam lista vazia.
     const raw = readRaw(normalizedEmail);
-
-    // 2. Sem chave, não há talhões salvos: devolvemos uma lista vazia.
-    // A comparação exata evita tratar texto vazio ou corrompido como ausência.
     if (raw === undefined) {
       return [];
     }
-
-    // 3. JSON.parse transforma texto JSON em um valor JavaScript.
-    // JSON válido pode conter null, um número ou uma estrutura inesperada.
-    // unknown nos obriga a conferir o resultado antes de usá-lo como documento.
     let plotsJSON: unknown;
-
     try {
       plotsJSON = JSON.parse(raw);
     } catch {
-      // Apenas a conversão fica no try: este erro indica falha de sintaxe JSON.
-      // Não gravamos [] por cima do texto inválido; ele permanece para recuperação.
       throw new Error("JSON dos talhões inválido.");
     }
-
-    // 4. Esperamos um objeto que contenha schemaVersion e plots.
-    // isRecord rejeita null, arrays e valores primitivos antes de ler esses campos.
     if (!isRecord(plotsJSON)) {
       throw new Error("Documento de talhões inválido.");
     }
-
-    // 5. "in" verifica a presença do campo; !== 1 rejeita versões não suportadas.
-    // schemaVersion é a versão do formato JSON, diferente da versão de uma revisão.
-    // Ler um formato desconhecido como se fosse o atual poderia interpretar dados errados.
     if (!("schemaVersion" in plotsJSON) || plotsJSON.schemaVersion !== 1) {
       throw new Error("Versão do documento não suportada.");
     }
-
-    // 6. O campo plots precisa existir e conter um array, mesmo sem talhões.
-    // Esta etapa valida a lista; a próxima valida o conteúdo de cada item.
     if (!("plots" in plotsJSON) || !Array.isArray(plotsJSON.plots)) {
       throw new Error("Lista de talhões inválida.");
     }
-
-    // 7. readPlot confere cada talhão, suas revisões e os dados de cada revisão.
-    // map reúne os resultados em Plot[]; o tipo vem das verificações, sem cast.
-    // Se um item falhar, list lança o erro e não devolve uma lista parcial.
     return plotsJSON.plots.map((plot: unknown) =>
       readPlot(plot, normalizedEmail),
     );
+  },
+
+  create(profileEmail: string, input: PlotInput): Plot {
+    const normalizedInput = normalizePlotInput(input);
+    const id = Crypto.randomUUID();
+    const savedAt = new Date().toISOString();
+    const revision: PlotRevision = {
+      version: 1,
+      savedAt,
+      data: normalizedInput,
+    };
+    const plot: Plot = { id, profileEmail, revisions: [revision] };
+    const plots = plotRepository.list(profileEmail);
+    const updatedPlots = [...plots, plot];
+    const json = JSON.stringify(updatedPlots);
+    const storage = getStorage();
+    const key = getProfileKey(profileEmail);
+    storage.set(key, json);
+
+    return plot;
   },
 };
