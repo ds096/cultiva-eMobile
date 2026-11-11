@@ -554,3 +554,40 @@ Os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) orientaram a etapa.
 **Critérios de conclusão:** jornada validada em dispositivo, regras críticas verificadas e bloqueios resolvidos ou explicitamente delimitados antes da distribuição. Registrar o que foi realmente testado; compilação bem-sucedida não substitui teste da experiência.
 
 **Perguntas de revisão:** quais falhas causariam perda de confiança ou dados? O que foi testado em aparelho e o que só foi inspecionado? Como uma atualização preserva registros ainda não enviados?
+
+### Ícone de remoção de cultura — 11/11/2026
+
+- Atividade: ação textual substituída por lixeira vermelha de 24 à direita dos dados, com `IconButton` do Paper e alvo de toque de 48 × 48. Mantido o nome da cultura no rótulo acessível; nomes longos podem quebrar linha. Como não há fonte de ícones instalada, o desenho usa formas nativas, sem instalar dependências; integração com a família de ícones do guia continua pendente.
+- Aprendizado: um ícone compacto precisa preservar área de toque e descrição para TalkBack. O botão remove apenas a cultura selecionada do formulário.
+- Verificações: sete testes passaram. Lint geral permanece com import inexistente de `Menu` e três avisos anteriores; typecheck mantém esse import e a declaração ausente de `eslint-config-expo/flat`. Sem novos diagnósticos nos arquivos alterados. Preservadas as alterações externas no estado vazio e a exclusão do plano de estudo.
+- Próximo exercício: conferir a lixeira, a remoção da cultura correta, nomes longos e TalkBack no Android. Verificação visual desta alteração pendente; módulo 4 continua em andamento.
+
+### Feedback temporário ao salvar talhão — 11/11/2026
+
+- Atividade: feedback geral de sucesso, validação ou falha ao salvar aparece antes dos campos, no topo de `createPlot.tsx`, com rolagem até o aviso. Desaparece após cinco segundos; uma nova tentativa reinicia o prazo. O temporizador é cancelado quando o aviso muda ou a tela é desmontada.
+- Aprendizado: aviso temporário e validação dos campos precisam de estados separados. O prazo encerra apenas o aviso geral; erros específicos permanecem nos campos e nas culturas. Falha ao salvar continua preservando o formulário, e sucesso continua limpando o cadastro.
+- Verificações: dez testes passaram, incluindo posição do aviso antes dos campos, expiração, permanência dos erros específicos, reinício do prazo e limpeza após sucesso. Temporizadores simulados, sem espera real nem gravação em perfis do aparelho. Typecheck permanece bloqueado pelos erros anteriores em `eslint-config-expo/flat` e no import de `Menu`; lint geral mantém o import de `Menu` e três avisos existentes. Nenhuma biblioteca instalada.
+- Próximo exercício: no Android, salvar um formulário incompleto, observar o aviso no topo e conferir que desaparece após cinco segundos enquanto as orientações dos campos continuam visíveis. Verificação visual desta alteração e TalkBack pendentes; módulo 4 segue em andamento.
+
+### Snackbar do Paper no cadastro de talhões — 11/11/2026
+
+- Atividade: substituído o aviso visual próprio por `Snackbar` do React Native Paper em `createPlot.tsx`, com duração de cinco segundos e encerramento por `onDismiss`. Mantido no topo, abaixo do cabeçalho e fora da rolagem, conforme o pedido anterior. Mensagens de sucesso e erro reutilizam cores do tema.
+- Aprendizado: o componente da biblioteca controla sua duração e animação, sem temporizador paralelo na tela. Uma chave nova por tentativa reinicia esse ciclo. Fechar o Snackbar não remove a validação dos campos; sucesso continua limpando o formulário e falha preserva seu conteúdo.
+- Verificações: dez testes passaram, incluindo integração com Snackbar, duração configurada, posição superior, fechamento sem perder erros e remontagem em nova tentativa. O harness não renderiza animações do Paper; verificação visual e TalkBack permanecem pendentes. Typecheck e lint gerais mantêm os bloqueios anteriores de `Menu` e tipos de ESLint. Nenhuma dependência instalada.
+- Próximo exercício: conferir no Android a apresentação e o desaparecimento do Snackbar de validação, sucesso e falha de gravação. Módulo 4 segue em andamento.
+
+### Avanço entre campos pelo teclado — 11/11/2026
+
+- Atividade: confirmação do teclado avança em `createPlot` na ordem nome do talhão, área, ano de plantio, nome da cultura e quantidade de plantas. Os quatro primeiros campos usam `returnKeyType="next"`, `submitBehavior="submit"` e foco por referência, preservando o teclado entre campos. O componente `PlotFormField` encaminha esses eventos ao TextInput do Paper e expõe somente o método de foco.
+- No último campo, Concluir adiciona a cultura válida e fecha o teclado. Se faltarem dados, o foco vai para o primeiro campo inválido da cultura. O cadastro do talhão continua sendo confirmado exclusivamente por Salvar talhão.
+- Aprendizado: a tecla exibida pelo teclado e a ação executada são contratos separados; o evento de confirmação precisa direcionar o foco explicitamente. A referência não armazena o texto digitado.
+- Verificações: doze testes passaram, incluindo os quatro destinos de foco e a inclusão da cultura pelo último campo sem persistir um talhão. Typecheck mantém apenas os bloqueios anteriores de `Menu` e tipos do ESLint; lint geral mantém o import inexistente de `Menu` e três avisos anteriores. Nenhuma dependência instalada. Documentação do SDK 58 e de TextInput conferida antes da implementação.
+- Próximo exercício: conferir a sequência no Android com teclado alfabético e numérico, incluindo ano vazio e cultura inválida. Comportamento nativo, iOS e TalkBack ainda pendentes; módulo 4 continua em andamento.
+- Referência: [TextInput — confirmação e foco](https://reactnative.dev/docs/textinput#submitbehavior).
+
+### Snackbar sem sobreposição e duração de três segundos — 11/11/2026
+
+- Atividade: Snackbar de sucesso ou falha passa a ocupar espaço próprio acima da rolagem, com posicionamento relativo, sem cobrir campos. Duração reduzida para 3000 ms; mantidos os erros específicos dos campos depois de fechar o aviso.
+- Aprendizado: avisos com posição absoluta podem sobrepor conteúdo; participar do fluxo do layout reserva sua altura e reduz apenas a área disponível para rolagem.
+- Verificações: doze testes passaram, incluindo posição relativa, ordem antes do formulário rolável e duração de três segundos. Lint/typecheck gerais mantêm os bloqueios anteriores de `Menu` e tipos de ESLint; sem novos diagnósticos nos arquivos alterados. Nenhuma dependência instalada. Teste visual desta alteração no Android pendente.
+- Próximo exercício: salvar com campos inválidos e conferir que o Snackbar não cobre o formulário, desaparece após três segundos e preserva as orientações nos campos. Módulo 4 segue em andamento.

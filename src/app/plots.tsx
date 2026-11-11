@@ -46,7 +46,13 @@ export default function PlotsScreen() {
   }
 
   if (status === "error") {
-    return <Text>Erro ao carregar talhões.</Text>;
+    return (
+      <>
+        {" "}
+        <Button title="Sair" onPress={handleExit} />
+        <Text>Erro ao carregar talhões.</Text>;
+      </>
+    );
   }
 
   function handleExit() {

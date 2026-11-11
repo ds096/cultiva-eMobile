@@ -202,6 +202,15 @@ export const plotRepository = {
     } catch {
       throw new Error("JSON dos talhões inválido.");
     }
+    // Descarte autorizado dos cadastros antigos, que eram salvos como array.
+    // Reinicia somente os talhões deste perfil; formatos desconhecidos seguem como erro.
+    if (Array.isArray(plotsJSON)) {
+      getStorage().set(
+        getProfileKey(normalizedEmail),
+        JSON.stringify({ schemaVersion: 1, plots: [] }),
+      );
+      return [];
+    }
     if (!isRecord(plotsJSON)) {
       throw new Error("Documento de talhões inválido.");
     }
@@ -217,6 +226,8 @@ export const plotRepository = {
   },
 
   create(profileEmail: string, input: PlotInput): Plot {
+    // A identidade gravada deve usar a mesma normalização da chave e da leitura.
+    const normalizedEmail = normalizeEmail(profileEmail);
     const normalizedInput = normalizePlotInput(input);
     const id = Crypto.randomUUID();
     const savedAt = new Date().toISOString();
@@ -225,12 +236,17 @@ export const plotRepository = {
       savedAt,
       data: normalizedInput,
     };
-    const plot: Plot = { id, profileEmail, revisions: [revision] };
-    const plots = plotRepository.list(profileEmail);
+    const plot: Plot = {
+      id,
+      profileEmail: normalizedEmail,
+      revisions: [revision],
+    };
+    const plots = plotRepository.list(normalizedEmail);
     const updatedPlots = [...plots, plot];
-    const json = JSON.stringify(updatedPlots);
+    // Grava o documento versionado exigido por list(), não apenas o array.
+    const json = JSON.stringify({ schemaVersion: 1, plots: updatedPlots });
     const storage = getStorage();
-    const key = getProfileKey(profileEmail);
+    const key = getProfileKey(normalizedEmail);
     storage.set(key, json);
 
     return plot;
