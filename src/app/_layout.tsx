@@ -41,9 +41,7 @@ function Navigation() {
   }
   return (
     <Stack>
-      <Stack.Protected guard={!email} redirectTo="/plots">
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-      </Stack.Protected>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Protected guard={!!email} redirectTo="/">
         <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
         <Stack.Screen

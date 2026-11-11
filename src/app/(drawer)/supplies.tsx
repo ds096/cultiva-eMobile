@@ -8,7 +8,7 @@ export default function SuppliesScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <SafeAreaView
-        edges={["top", "left", "right"]}
+        edges={["left", "right", "bottom"]}
         style={{
           flex: 1,
           alignItems: "center",

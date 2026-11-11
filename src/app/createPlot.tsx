@@ -10,6 +10,7 @@ import {
 import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useHeaderHeight } from "expo-router/react-navigation";
+import { router } from "expo-router";
 import { plotRepository } from "../repositories/plotRepository";
 import { useProfile } from "../context/ProfileContext";
 import {
@@ -165,6 +166,7 @@ export default function CreatePlotScreen() {
 
     saveLock.current = true;
     setSaving(true);
+    let destination: "/plans" | "/plots";
     try {
       if (!email) throw new Error("Perfil não identificado.");
       const input: PlotInput = {
@@ -174,22 +176,33 @@ export default function CreatePlotScreen() {
         crops: crops.map(({ name, quantity }) => ({ name, quantity })),
       };
       // MMKV é síncrono: não há espera artificial nem confirmação de sincronização.
+      // Decide antes da escrita, considerando apenas os talhões deste perfil.
+      const isFirstPlot = plotRepository.list(email).length === 0;
       plotRepository.create(email, input);
+      destination = isFirstPlot ? "/plans" : "/plots";
       setFields({ ...emptyFields });
       setCrops([]);
       nextCropId.current = 0;
       setErrors({});
-      showFeedback("success", "Talhão cadastrado com sucesso!");
-      // Mantém a trava após sucesso até uma nova edição, evitando toque repetido.
+      // Mantém a trava até a desmontagem, evitando salvamento duplicado.
     } catch {
       showFeedback(
         "error",
         "Não foi possível salvar o talhão. Seus campos foram mantidos. Tente novamente.",
       );
       saveLock.current = false;
+      return;
     } finally {
       setSaving(false);
     }
+    // Navegação fica fora do tratamento de persistência: uma falha de navegação
+    // após gravar não pode liberar outra gravação do mesmo cadastro.
+    Keyboard.dismiss();
+    router.dismissTo({
+      pathname: destination,
+      // Na lista, o novo talhão já confirma o sucesso do cadastro.
+      params: destination === "/plans" ? { plotCreated: "true" } : undefined,
+    });
   }
 
   return (

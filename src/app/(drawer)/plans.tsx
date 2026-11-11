@@ -2,13 +2,17 @@ import { View } from "react-native";
 import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme, tokens } from "../../theme/theme";
+import PlotCreatedFeedback from "../../components/PlotCreatedFeedback";
 
-// Tela provisória: centraliza o aviso na área disponível acima do menu fixo.
+// Inclui a confirmação e o conteúdo na mesma área segura inferior.
 export default function PlansScreen() {
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <SafeAreaView
-        edges={["top", "left", "right"]}
+    <SafeAreaView
+      edges={["left", "right", "bottom"]}
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
+    >
+      <PlotCreatedFeedback />
+      <View
         style={{
           flex: 1,
           alignItems: "center",
@@ -19,7 +23,7 @@ export default function PlansScreen() {
         <Text variant="bodyLarge" style={{ textAlign: "center" }}>
           Tela em desenvolvimento
         </Text>
-      </SafeAreaView>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }

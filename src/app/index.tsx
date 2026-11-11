@@ -17,9 +17,16 @@ import {
 import { useProfile } from "../context/ProfileContext";
 import { theme, tokens } from "../theme/theme";
 import { normalizeEmail, validateEmail } from "../utilities/email";
+import ProfileLanding from "../components/ProfileLanding";
 
 // Seleciona um perfil local sem comprovar a identidade do produtor.
 export default function AccessScreen() {
+  const { email } = useProfile();
+  // Tanto a seleção quanto a restauração passam pela mesma decisão de entrada.
+  return email ? <ProfileLanding key={email} email={email} /> : <AccessForm />;
+}
+
+function AccessForm() {
   const { selectProfile } = useProfile();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -51,7 +58,7 @@ export default function AccessScreen() {
     try {
       // MMKV é síncrono: não acrescentamos espera artificial para mostrar animação.
       selectProfile(normalizedEmail);
-      // O layout observa o perfil salvo e redireciona para /plots.
+      // A tela observa o perfil salvo e consulta seu destino de entrada.
       // Mantém a trava até esta tela ser desmontada.
     } catch {
       // Libera nova tentativa apenas na falha, preservando o texto digitado.

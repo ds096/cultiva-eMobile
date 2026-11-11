@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Button, ScrollView, View } from "react-native";
+import { Button, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "react-native-paper";
 import { useProfile } from "../../context/ProfileContext";
 import { theme } from "../../theme/theme";
@@ -24,12 +25,15 @@ export default function SettingsScreen() {
     }
   }
   return (
-    // O conteúdo rola separadamente; o menu ocupa o rodapé sem cobrir a tela.
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    // O cabeçalho protege o topo; a área segura mantém a rolagem acima da barra.
+    <SafeAreaView
+      edges={["left", "right", "bottom"]}
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
+    >
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
         {erro !== "" && <Text>{erro}</Text>}
         <Button title="Sair" onPress={handleExit} />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }

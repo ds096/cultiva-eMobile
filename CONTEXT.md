@@ -65,6 +65,7 @@ Na etapa de aprendizagem local, o primeiro passo é selecionar um perfil por e-m
 
 ### Talhões e acesso
 
+- Ao selecionar ou restaurar o perfil local, abrir Calendário se houver talhões cadastrados; caso contrário, abrir Talhões. Após salvar o primeiro talhão, abrir Planos de manejo com confirmação de salvamento; nos demais cadastros, retornar a Talhões sem mensagem de sucesso, pois o novo talhão na lista confirma o cadastro.
 - Permitir cadastrar, consultar e editar talhões.
 - Cada produtor acessa apenas os próprios registros, fotos e revisões na versão autenticada. Separação local por e-mail não equivale a uma barreira de segurança.
 - Talhão: nome, área em hectares e ao menos uma cultura com quantidade são obrigatórios; ano de plantio e localização são opcionais. A área aceita decimais com vírgula ou ponto na interface, deve ser finita e positiva e não tem limite fixo de casas decimais nem arredondamento automático.

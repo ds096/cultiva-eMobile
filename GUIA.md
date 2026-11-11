@@ -121,7 +121,7 @@ Um módulo agrupa várias atividades; não é uma tarefa para executar de uma ve
 | 2. Base visual e navegação   | Preparar componentes e caminhos entre telas                             | Concluído pelo responsável; confirmado em 23/10/2026            |
 | 3. Acesso por perfil local   | Selecionar e restaurar um perfil local                                  | Concluído por decisão do responsável em 28/10/2026              |
 | 4. Persistência e talhões    | Manter cadastros e revisões no dispositivo                              | Concluído por decisão do responsável em concluída em 11/11/2026 |
-| 5. Menu e navegação          | Definir o menu, sua presença nas telas e os comportamentos de navegação | Pendente                                                        |
+| 5. Menu e navegação          | Definir o menu, sua presença nas telas e os comportamentos de navegação | Concluído por decisão do responsável em concluída em 11/11/2026 |
 | 6. Planos de manejo          | Criar modelos próprios de atividades                                    | Pendente                                                        |
 | 7. Atividades dos talhões    | Importar cópias e organizar o planejamento                              | Pendente                                                        |
 | 8. Insumos e cálculos        | Cadastrar aquisições e definir cálculos confiáveis                      | Pendente                                                        |

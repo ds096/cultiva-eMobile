@@ -10,13 +10,16 @@ const ts = require("typescript");
 /** @typedef {{ type: unknown, props: Record<string, any>, key?: string | null }} Element */
 
 /** @param {import("node:test").TestContext} t */
-function createScreenHarness(t) {
+function createScreenHarness(t, existingPlots = 0) {
   /** @type {any[]} */
   const slots = [];
   /** @type {unknown[]} */
   const writes = [];
+  /** @type {Array<{ pathname: string, params?: { plotCreated: string } }>} */
+  const destinations = [];
   let cursor = 0;
   let failWrite = false;
+  let failRead = false;
   /** @type {Map<number, { deps: unknown[], cleanup?: void | (() => void) }>} */
   const effects = new Map();
   /** @type {Array<() => void>} */
@@ -88,7 +91,14 @@ function createScreenHarness(t) {
         };
       if (name === "react-native-safe-area-context")
         return { SafeAreaView: "SafeAreaView" };
-      if (name === "expo-router") return { Stack: { Screen: "Stack.Screen" } };
+      if (name === "expo-router")
+        return {
+          router: {
+            dismissTo: (
+              /** @type {{ pathname: string, params?: { plotCreated: string } }} */ destination,
+            ) => destinations.push(destination),
+          },
+        };
       if (name === "expo-router/react-navigation")
         return { useHeaderHeight: () => 0 };
       if (name.endsWith("ProfileContext"))
@@ -102,6 +112,10 @@ function createScreenHarness(t) {
       if (name.endsWith("plotRepository"))
         return {
           plotRepository: {
+            list() {
+              if (failRead) throw new Error("Falha simulada de leitura");
+              return Array(existingPlots + writes.length).fill({});
+            },
             create(/** @type {string} */ email, /** @type {unknown} */ input) {
               if (failWrite) throw new Error("Falha simulada de escrita");
               writes.push({ email, input });
@@ -164,11 +178,49 @@ function createScreenHarness(t) {
     button,
     fillValidForm,
     writes,
+    destinations,
     fail: () => {
       failWrite = true;
     },
+    failRead: () => {
+      failRead = true;
+    },
   };
 }
+
+for (const count of [0, 1, 3]) {
+  test(`salvar com ${count} talhões anteriores navega ao destino correto uma única vez`, (t) => {
+    const screen = createScreenHarness(t, count);
+    screen.fillValidForm();
+    const save = screen.button("Salvar talhão");
+    save();
+    save();
+    assert.equal(screen.writes.length, 1);
+    assert.equal(screen.destinations.length, 1);
+    assert.equal(
+      screen.destinations[0].pathname,
+      count === 0 ? "/plans" : "/plots",
+    );
+    if (count === 0) {
+      assert.equal(screen.destinations[0].params?.plotCreated, "true");
+    } else {
+      assert.equal(screen.destinations[0].params, undefined);
+    }
+  });
+}
+
+test("falha ao consultar talhões antes de salvar preserva o formulário e não navega", (t) => {
+  const screen = createScreenHarness(t);
+  screen.fillValidForm();
+  screen.failRead();
+  screen.button("Salvar talhão")();
+  assert.equal(screen.writes.length, 0);
+  assert.equal(screen.destinations.length, 0);
+  assert.equal(
+    screen.render().find((node) => node.props.id === "plot-name")?.props.value,
+    "Talhão Norte",
+  );
+});
 
 test("sucesso limpa todos os campos e culturas; toque repetido não salva novamente", (t) => {
   const screen = createScreenHarness(t);
@@ -203,6 +255,7 @@ test("falha de persistência mantém campos e culturas para nova tentativa", (t)
   screen.fail();
   screen.button("Salvar talhão")();
   assert.equal(screen.writes.length, 0);
+  assert.equal(screen.destinations.length, 0);
   const fields = screen.render().filter((node) => node.type === "Field");
   assert.equal(
     fields.find((node) => node.props.id === "plot-name")?.props.value,
