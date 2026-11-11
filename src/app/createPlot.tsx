@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { ComponentRef } from "react";
 import {
   Keyboard,
@@ -7,7 +7,7 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { Snackbar, Text } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useHeaderHeight } from "expo-router/react-navigation";
 import { plotRepository } from "../repositories/plotRepository";
@@ -38,9 +38,9 @@ const emptyFields = {
 };
 type Field = keyof typeof emptyFields;
 type FormErrors = Partial<Record<Field | "crops", string>>;
-type Feedback = { id: number; kind: "success" | "error"; message: string };
+type Feedback = { kind: "success" | "error"; message: string };
 // O aviso geral é temporário; os erros dos campos têm um estado independente.
-const feedbackDuration = 3000;
+const feedbackDuration = 5000;
 
 // Cadastro local: valida antes de gravar e só limpa o formulário após confirmação.
 export default function CreatePlotScreen() {
@@ -54,18 +54,22 @@ export default function CreatePlotScreen() {
   const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
   const nextCropId = useRef(0);
   const saveLock = useRef(false);
-  const feedbackSequence = useRef(0);
-  // As referências apontam para os campos reais; não guardam valores do formulário.
+  // Cada referência permite levar o foco ao campo seguinte sem fechar o teclado.
   const areaRef = useRef<PlotFormInput>(null);
   const yearRef = useRef<PlotFormInput>(null);
   const cropNameRef = useRef<PlotFormInput>(null);
   const cropQuantityRef = useRef<PlotFormInput>(null);
 
+  useEffect(() => {
+    if (!feedback) return;
+    const timer = setTimeout(() => setFeedback(null), feedbackDuration);
+    // Uma nova tentativa reinicia o prazo; sair da tela cancela o temporizador.
+    return () => clearTimeout(timer);
+  }, [feedback]);
+
   // Leva o aviso ao usuário mesmo quando Salvar é acionado no fim da rolagem.
   function showFeedback(kind: Feedback["kind"], message: string) {
-    // Uma chave nova reinicia a duração nativa do Snackbar a cada tentativa.
-    feedbackSequence.current += 1;
-    setFeedback({ id: feedbackSequence.current, kind, message });
+    setFeedback({ kind, message });
     Keyboard.dismiss();
     scrollRef.current?.scrollTo({ y: 0, animated: true });
   }
@@ -89,7 +93,7 @@ export default function CreatePlotScreen() {
     }
     setErrors((previous) => ({ ...previous, ...cropErrors, crops: undefined }));
     if (Object.keys(cropErrors).length > 0) {
-      // Mantém o teclado no primeiro dado da cultura que precisa de correção.
+      // A confirmação no último campo mantém o foco no primeiro dado inválido.
       if (cropErrors.cropName) cropNameRef.current?.focus();
       else cropQuantityRef.current?.focus();
       return false;
@@ -136,7 +140,7 @@ export default function CreatePlotScreen() {
     try {
       validatePlotArea(area);
     } catch {
-      validation.area = "Informe uma área maior que zero, como 2,5.";
+      validation.area = "Informe uma área maior que zero.";
     }
     if (plantingYear !== undefined) {
       try {
@@ -175,10 +179,7 @@ export default function CreatePlotScreen() {
       setCrops([]);
       nextCropId.current = 0;
       setErrors({});
-      showFeedback(
-        "success",
-        "Talhão cadastrado com sucesso! Salvo neste dispositivo.",
-      );
+      showFeedback("success", "Talhão cadastrado com sucesso!");
       // Mantém a trava após sucesso até uma nova edição, evitando toque repetido.
     } catch {
       showFeedback(
@@ -200,42 +201,39 @@ export default function CreatePlotScreen() {
         keyboardVerticalOffset={headerHeight}
         style={styles.flex}
       >
-        {/* O Paper controla a duração; fechar o aviso não limpa os erros dos campos. */}
-        {feedback && (
-          <Snackbar
-            key={feedback.id}
-            testID="plot-feedback"
-            visible
-            duration={feedbackDuration}
-            onDismiss={() => setFeedback(null)}
-            wrapperStyle={styles.snackbarWrapper}
-            style={[
-              styles.feedback,
-              feedback.kind === "success"
-                ? styles.success
-                : styles.errorFeedback,
-            ]}
-          >
-            <Text
-              variant="bodyLarge"
-              style={
-                feedback.kind === "success" ? styles.successText : styles.error
-              }
-              accessibilityRole="alert"
-              accessibilityLiveRegion="polite"
-            >
-              {feedback.message}
-            </Text>
-          </Snackbar>
-        )}
         <ScrollView
-          style={styles.flex}
           ref={scrollRef}
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
         >
           <View style={styles.form}>
+            {/* Apenas o aviso geral expira; a validação permanece em cada campo. */}
+            {feedback && (
+              <View
+                testID="plot-feedback"
+                style={[
+                  styles.feedback,
+                  feedback.kind === "success"
+                    ? styles.success
+                    : styles.errorFeedback,
+                ]}
+              >
+                <Text
+                  variant="bodyLarge"
+                  style={
+                    feedback.kind === "success"
+                      ? styles.successText
+                      : styles.error
+                  }
+                  accessibilityRole="alert"
+                  accessibilityLiveRegion="polite"
+                >
+                  {feedback.message}
+                </Text>
+              </View>
+            )}
+
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text variant="labelLarge" style={styles.step}>
@@ -251,11 +249,11 @@ export default function CreatePlotScreen() {
               </View>
               <PlotFormField
                 id="plot-name"
-                // submit envia a confirmação sem fechar o teclado entre campos.
+                // Confirmação envia o evento sem desfocar antes do próximo campo.
                 returnKeyType="next"
                 submitBehavior="submit"
                 onSubmitEditing={() => areaRef.current?.focus()}
-                label="Nome do talhão"
+                label="Nome"
                 value={fields.name}
                 onChangeText={(value: string) => updateField("name", value)}
                 error={errors.name}
@@ -267,8 +265,7 @@ export default function CreatePlotScreen() {
                 returnKeyType="next"
                 submitBehavior="submit"
                 onSubmitEditing={() => yearRef.current?.focus()}
-                label="Área do talhão (ha)"
-
+                label="Área (ha)"
                 keyboardType="decimal-pad"
                 value={fields.area}
                 onChangeText={(value: string) => updateField("area", value)}
@@ -324,7 +321,7 @@ export default function CreatePlotScreen() {
                 returnKeyType="done"
                 submitBehavior="submit"
                 onSubmitEditing={() => {
-                  // Concluir adiciona a cultura; salvar o talhão continua explícito.
+                  // Concluir inclui a cultura; o botão Salvar confirma o talhão.
                   if (handleAddCrop()) Keyboard.dismiss();
                 }}
                 label="Quantidade de plantas"
@@ -375,7 +372,7 @@ export default function CreatePlotScreen() {
                     accessibilityRole="alert"
                     accessibilityLiveRegion="polite"
                   >
-                    Atenção: {errors.crops}
+                    {errors.crops}
                   </Text>
                 )}
               </View>
@@ -453,16 +450,11 @@ const styles = StyleSheet.create({
   cropInfo: { gap: tokens.space.xs },
   cropText: { flex: 1 },
   footer: { gap: tokens.space.md },
-  // Reserva espaço no fluxo acima da rolagem: o aviso nunca cobre os campos.
-  snackbarWrapper: {
-    position: "relative",
-    flexShrink: 0,
-    bottom: undefined,
-    paddingBottom: 0,
-    alignSelf: "center",
-    maxWidth: tokens.size.formWidth,
+  feedback: {
+    borderRadius: tokens.radius.card,
+    padding: tokens.space.md,
+    gap: tokens.space.sm,
   },
-  feedback: { borderRadius: tokens.radius.input },
   success: { backgroundColor: tokens.color.successBg },
   errorFeedback: { backgroundColor: tokens.color.errorBg },
   successText: { color: tokens.color.success },

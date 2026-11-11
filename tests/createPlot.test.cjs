@@ -9,15 +9,36 @@ const ts = require("typescript");
 
 /** @typedef {{ type: unknown, props: Record<string, any>, key?: string | null }} Element */
 
-function createScreenHarness() {
+/** @param {import("node:test").TestContext} t */
+function createScreenHarness(t) {
   /** @type {any[]} */
   const slots = [];
   /** @type {unknown[]} */
   const writes = [];
   let cursor = 0;
   let failWrite = false;
+  /** @type {Map<number, { deps: unknown[], cleanup?: void | (() => void) }>} */
+  const effects = new Map();
+  /** @type {Array<() => void>} */
+  const pendingEffects = [];
+  // Cancela os efeitos da tela ao encerrar cada teste, inclusive seus timers.
+  t.after(() => effects.forEach((effect) => effect.cleanup?.()));
   // O estado persiste entre chamadas da tela, sem montar módulos nativos.
   const hooks = {
+    /** @param {() => void | (() => void)} effect @param {unknown[]} deps */
+    useEffect(effect, deps) {
+      const slot = cursor++;
+      const previous = effects.get(slot);
+      if (
+        !previous ||
+        deps.some((value, index) => !Object.is(value, previous.deps[index]))
+      ) {
+        pendingEffects.push(() => {
+          previous?.cleanup?.();
+          effects.set(slot, { deps, cleanup: effect() });
+        });
+      }
+    },
     /** @param {any} initial */
     useState(initial) {
       const slot = cursor++;
@@ -109,6 +130,8 @@ function createScreenHarness() {
       walk(node.props.children);
     }
     walk(Screen());
+    // Executa os efeitos depois da renderização simulada.
+    pendingEffects.splice(0).forEach((run) => run());
     return elements;
   }
   /** @param {string} id @param {string} value */
@@ -147,8 +170,8 @@ function createScreenHarness() {
   };
 }
 
-test("sucesso limpa todos os campos e culturas; toque repetido não salva novamente", () => {
-  const screen = createScreenHarness();
+test("sucesso limpa todos os campos e culturas; toque repetido não salva novamente", (t) => {
+  const screen = createScreenHarness(t);
   screen.fillValidForm();
   const save = screen.button("Salvar talhão");
   save();
@@ -174,8 +197,8 @@ test("sucesso limpa todos os campos e culturas; toque repetido não salva novame
   assert.equal(screen.writes.length, 2);
 });
 
-test("falha de persistência mantém campos e culturas para nova tentativa", () => {
-  const screen = createScreenHarness();
+test("falha de persistência mantém campos e culturas para nova tentativa", (t) => {
+  const screen = createScreenHarness(t);
   screen.fillValidForm();
   screen.fail();
   screen.button("Salvar talhão")();
@@ -212,8 +235,8 @@ test("falha de persistência mantém campos e culturas para nova tentativa", () 
   );
 });
 
-test("cultura ainda não adicionada bloqueia salvamento sem apagar o texto", () => {
-  const screen = createScreenHarness();
+test("cultura ainda não adicionada bloqueia salvamento sem apagar o texto", (t) => {
+  const screen = createScreenHarness(t);
   screen.fillValidForm();
   screen.fill("crop-name", "Milho");
   screen.button("Salvar talhão")();
@@ -238,8 +261,8 @@ test("cultura ainda não adicionada bloqueia salvamento sem apagar o texto", () 
 });
 
 // Valida o contrato com o Snackbar; duração e animação são executadas pelo Paper.
-test("Snackbar de erro fica no topo e seu fechamento preserva a validação", () => {
-  const screen = createScreenHarness();
+test("Snackbar de erro fica no topo e seu fechamento preserva a validação", (t) => {
+  const screen = createScreenHarness(t);
   screen.button("Salvar talhão")();
   const snackbar = screen.render().find((node) => node.type === "Snackbar");
   assert.ok(snackbar);
@@ -281,8 +304,8 @@ test("Snackbar de erro fica no topo e seu fechamento preserva a validação", ()
   assert.equal(screen.writes.length, 0);
 });
 
-test("fechar Snackbar de sucesso mantém o formulário limpo", () => {
-  const screen = createScreenHarness();
+test("fechar Snackbar de sucesso mantém o formulário limpo", (t) => {
+  const screen = createScreenHarness(t);
   screen.fillValidForm();
   screen.button("Salvar talhão")();
   const snackbar = screen.render().find((node) => node.type === "Snackbar");
@@ -298,8 +321,8 @@ test("fechar Snackbar de sucesso mantém o formulário limpo", () => {
   );
 });
 
-test("nova tentativa remonta Snackbar para reiniciar a duração do Paper", () => {
-  const screen = createScreenHarness();
+test("nova tentativa remonta Snackbar para reiniciar a duração do Paper", (t) => {
+  const screen = createScreenHarness(t);
   screen.button("Salvar talhão")();
   const first = screen.render().find((node) => node.type === "Snackbar");
   screen.button("Salvar talhão")();
@@ -311,8 +334,8 @@ test("nova tentativa remonta Snackbar para reiniciar a duração do Paper", () =
 });
 
 // Confere o destino real de cada confirmação sem depender de um teclado específico.
-test("confirmar no teclado avança pelos quatro próximos campos sem fechar o teclado", () => {
-  const screen = createScreenHarness();
+test("confirmar no teclado avança pelos quatro próximos campos sem fechar o teclado", (t) => {
+  const screen = createScreenHarness(t);
   const order = [
     "plot-name",
     "plot-area",
@@ -339,8 +362,8 @@ test("confirmar no teclado avança pelos quatro próximos campos sem fechar o te
   assert.equal(screen.writes.length, 0);
 });
 
-test("concluir no último campo adiciona a cultura sem salvar o talhão", () => {
-  const screen = createScreenHarness();
+test("concluir no último campo adiciona a cultura sem salvar o talhão", (t) => {
+  const screen = createScreenHarness(t);
   screen.fill("crop-name", "Café");
   screen.fill("crop-quantity", "100");
   const last = screen

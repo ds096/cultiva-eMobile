@@ -114,23 +114,23 @@ Um módulo agrupa várias atividades; não é uma tarefa para executar de uma ve
 
 **Base já validada pelo responsável:** `src/theme/theme.ts`. Essa validação não conclui o módulo de interface nem garante compilação do aplicativo.
 
-| Módulo                       | Resultado principal                                                     | Estado                                                                  |
-| ---------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| 0. Produto e diagnóstico     | Entender o produto e a situação real do projeto                         | Concluído pelo responsável em 18/10/2026                                |
-| 1. Fundamentos e estrutura   | Compreender responsabilidades e fluxo de dados                          | Concluído pelo responsável; confirmado em 23/10/2026                    |
-| 2. Base visual e navegação   | Preparar componentes e caminhos entre telas                             | Concluído pelo responsável; confirmado em 23/10/2026                    |
-| 3. Acesso por perfil local   | Selecionar e restaurar um perfil local                                  | Concluído por decisão do responsável em 28/10/2026                      |
-| 4. Persistência e talhões    | Manter cadastros e revisões no dispositivo                              | Em andamento; 4.3.1 concluída em 05/11/2026; criação e edição pendentes |
-| 5. Menu e navegação          | Definir o menu, sua presença nas telas e os comportamentos de navegação | Pendente                                                                |
-| 6. Planos de manejo          | Criar modelos próprios de atividades                                    | Pendente                                                                |
-| 7. Atividades dos talhões    | Importar cópias e organizar o planejamento                              | Pendente                                                                |
-| 8. Insumos e cálculos        | Cadastrar aquisições e definir cálculos confiáveis                      | Pendente                                                                |
-| 9. Lançamento único          | Registrar execução uma única vez, sem edição posterior                  | Pendente                                                                |
-| 10. Fotos e histórico        | Preservar fotos e consultar o que foi realizado                         | Pendente                                                                |
-| 11. Calendário e lembretes   | Consultar a agenda e receber notificações locais                        | Pendente                                                                |
-| 12. Backend e autenticação   | Identificar o produtor e proteger seus dados remotos                    | Pendente                                                                |
-| 13. Sincronização            | Enviar e reconciliar dados e fotos com segurança                        | Pendente                                                                |
-| 14. Qualidade e distribuição | Validar e distribuir a versão Android                                   | Pendente                                                                |
+| Módulo                       | Resultado principal                                                     | Estado                                                          |
+| ---------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------- |
+| 0. Produto e diagnóstico     | Entender o produto e a situação real do projeto                         | Concluído pelo responsável em 18/10/2026                        |
+| 1. Fundamentos e estrutura   | Compreender responsabilidades e fluxo de dados                          | Concluído pelo responsável; confirmado em 23/10/2026            |
+| 2. Base visual e navegação   | Preparar componentes e caminhos entre telas                             | Concluído pelo responsável; confirmado em 23/10/2026            |
+| 3. Acesso por perfil local   | Selecionar e restaurar um perfil local                                  | Concluído por decisão do responsável em 28/10/2026              |
+| 4. Persistência e talhões    | Manter cadastros e revisões no dispositivo                              | Concluído por decisão do responsável em concluída em 11/11/2026 |
+| 5. Menu e navegação          | Definir o menu, sua presença nas telas e os comportamentos de navegação | Pendente                                                        |
+| 6. Planos de manejo          | Criar modelos próprios de atividades                                    | Pendente                                                        |
+| 7. Atividades dos talhões    | Importar cópias e organizar o planejamento                              | Pendente                                                        |
+| 8. Insumos e cálculos        | Cadastrar aquisições e definir cálculos confiáveis                      | Pendente                                                        |
+| 9. Lançamento único          | Registrar execução uma única vez, sem edição posterior                  | Pendente                                                        |
+| 10. Fotos e histórico        | Preservar fotos e consultar o que foi realizado                         | Pendente                                                        |
+| 11. Calendário e lembretes   | Consultar a agenda e receber notificações locais                        | Pendente                                                        |
+| 12. Backend e autenticação   | Identificar o produtor e proteger seus dados remotos                    | Pendente                                                        |
+| 13. Sincronização            | Enviar e reconciliar dados e fotos com segurança                        | Pendente                                                        |
+| 14. Qualidade e distribuição | Validar e distribuir a versão Android                                   | Pendente                                                        |
 
 A trilha tem **14 módulos de desenvolvimento (1 a 14)**, além do **módulo 0**, de produto e diagnóstico. O mapa e as seções detalhadas usam a mesma numeração. A consulta de histórico em `[id]` pertence à atividade **10.3**.
 
@@ -591,3 +591,10 @@ Os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) orientaram a etapa.
 - Aprendizado: avisos com posição absoluta podem sobrepor conteúdo; participar do fluxo do layout reserva sua altura e reduz apenas a área disponível para rolagem.
 - Verificações: doze testes passaram, incluindo posição relativa, ordem antes do formulário rolável e duração de três segundos. Lint/typecheck gerais mantêm os bloqueios anteriores de `Menu` e tipos de ESLint; sem novos diagnósticos nos arquivos alterados. Nenhuma dependência instalada. Teste visual desta alteração no Android pendente.
 - Próximo exercício: salvar com campos inválidos e conferir que o Snackbar não cobre o formulário, desaparece após três segundos e preserva as orientações nos campos. Módulo 4 segue em andamento.
+
+### Guia de criação e avanço pelo teclado — 11/11/2026
+
+- Atividade: conectado novamente o avanço entre campos da tela atual, com Concluir adicionando a cultura válida e foco no primeiro campo inválido em caso de erro. Criado [guia de criação de talhões](<guia_criação de talhões.md>) explicando `PlotFormControls`, estado, referências, culturas, validação, salvamento e limitações verificadas.
+- Aprendizado: os controles já encaminhavam as propriedades de teclado, mas a tela atual precisava fornecer referências e handlers. O guia descreve a árvore presente e distingue o aviso próprio de cinco segundos do requisito anterior de Snackbar de três segundos.
+- Verificações: dois testes específicos de teclado passaram. Suíte completa: sete passaram e cinco falharam por divergências de feedback/mensagens. Adicionado suporte a `useEffect` no simulador de testes para exercitar a tela atual. Lint e typecheck mantêm bloqueios anteriores de `Menu` e tipos de ESLint. Nenhuma biblioteca instalada.
+- Próximo exercício: conferir o foco no Android e alinhar o feedback e seus testes em atividade própria. Módulo 4 permanece em andamento.
