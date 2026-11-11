@@ -1,8 +1,8 @@
 # cultiva-e — contexto do produto
 
-Atualizado em 18/10/2026. Nome canônico neste repositório: `contex.md`.
+Revisado em 11/11/2026. Este arquivo registra decisões de produto e pendências; consulte o código e o [guia de aprendizagem](GUIA.md) para verificar implementação e progresso.
 
-Este documento reúne decisões do responsável pelo produto. Requisito aprovado não significa funcionalidade implementada. Consulte o [acordo de trabalho](AGENTS.md), a [trilha de aprendizagem](guia.md) e o [guia visual](GUIA-VISUAL.MD).
+Este documento reúne decisões do responsável pelo produto. Requisito aprovado não significa funcionalidade implementada. Consulte o [acordo de trabalho](AGENTS.md), a [trilha de aprendizagem](GUIA.md) e o [guia visual](GUIA-VISUAL.md).
 
 ## 1. Propósito, público e aprendizagem
 
@@ -27,9 +27,9 @@ Este é o primeiro aplicativo do responsável. A reconstrução também é uma t
 | Aplicativo | React Native com Expo; plataforma inicial Android. |
 | Linguagem | TypeScript com verificação estrita. |
 | Navegação | Expo Router; telas em `src/app/`, demais responsabilidades fora dessa pasta. |
-| Interface | React Native Paper, tema em `src/theme/theme.ts` e padrões do guia visual. Instalação exige autorização. |
+| Interface | React Native Paper, tema em `src/theme/theme.ts` e padrões do guia visual. Novas instalações exigem autorização. |
 | Etapa local | Perfil por e-mail normalizado, sem senha, sem comprovação de identidade e sem autorização remota. Informar essa limitação no acesso. |
-| Persistência local | MMKV aprovado; exige compilação Android própria e não está incluído no Expo Go. Instalação e funcionamento ainda não comprovados neste repositório. |
+| Persistência local | MMKV aprovado; exige compilação Android própria e não está incluído no Expo Go. A dependência e os repositórios locais estão presentes; validar alterações no Android quando aplicável. |
 | Backend | Futuro backend próprio com Node.js, TypeScript e Fastify; responsável pelas validações definitivas e autorização. |
 | Banco remoto | MongoDB; modelagem física, índices, driver/ODM e hospedagem pendentes. |
 | Autenticação definitiva | Solução consolidada sob controle do backend; solução específica pendente. O perfil local não a substitui. |
@@ -67,7 +67,7 @@ Na etapa de aprendizagem local, o primeiro passo é selecionar um perfil por e-m
 
 - Permitir cadastrar, consultar e editar talhões.
 - Cada produtor acessa apenas os próprios registros, fotos e revisões na versão autenticada. Separação local por e-mail não equivale a uma barreira de segurança.
-- Definir campos e obrigatoriedade no contrato antes de implementar o cadastro; não transformar sugestões antigas em exigências.
+- Talhão: nome, área em hectares e ao menos uma cultura com quantidade são obrigatórios; ano de plantio e localização são opcionais. A área aceita decimais com vírgula ou ponto na interface, deve ser finita e positiva e não tem limite fixo de casas decimais nem arredondamento automático.
 - Preservar revisões das entidades editáveis e apresentar a versão atual.
 
 ### Planos e atividades
@@ -116,47 +116,22 @@ Interface em português, simples para uso no campo, com tons verdes, fundos clar
 
 Cada funcionalidade deve contemplar os estados aplicáveis: carregamento, vazio, erro, validação, salvamento local, sincronização pendente e rejeição. Situação da atividade e estado de envio são informações diferentes. Distinguir falha de conexão de rejeição pelo servidor, e registro aceito de foto ainda pendente.
 
-## 6. Estado observado em 18/10/2026
+## 6. Implementação e progresso
 
-Esta é uma inspeção do repositório, não comprovação de funcionamento do aplicativo:
+O repositório contém rotas em `src/app/`, domínio de talhões, contexto de perfil e repositórios locais. O repositório de talhões possui leitura, consulta por ID e criação com revisão inicial. A existência do código não comprova que o fluxo completo tenha sido testado em aparelho ou concluído.
 
-- `package.json` declara Expo `~58.0.14`, React Native `0.88.0` e Expo Router `~58.0.23`; `tsconfig.json` habilita `strict`. Existe `package-lock.json`; não foi encontrado `bun.lock`.
-- [src/theme/theme.ts](src/theme/theme.ts) existe e foi validado pelo responsável. A verificação técnica do projeto ainda encontra dependência ausente; isso não revoga a validação visual declarada.
-- Na conferência final, o único arquivo encontrado sob `src/` foi o tema. Não há telas, layout ou provedor de estado presentes. A estrutura inicial de navegação ainda precisa ser construída em atividade acordada.
-- Na inspeção inicial, `src/app/_layout.tsx` mencionava telas ausentes `index` e `plots`; `src/state/AppProvider.tsx` referenciava módulos ausentes: `components/ActionButton`, `components/ErrorMessage`, `components/Screen`, `data/mmkv`, `data/repository`, `domain/commands`, `domain/models` e `services/notifications`, sob `src/`. Ambos os arquivos deixaram de estar presentes durante esta entrega, sem alteração deles pelo agente. Essas referências são registro histórico do diagnóstico, não uma lista de arquivos que devem ser recriados automaticamente.
-- `react-native-paper` é importado pelo tema, mas não consta no manifesto. `expo-crypto` era importado pelo provedor anteriormente observado e também não consta no manifesto; não há necessidade atual comprovada de instalá-lo. MMKV é uma decisão aprovada, sem dependência declarada ou implementação local correspondente encontrada. Nenhuma biblioteca foi instalada nesta entrega.
-- Há alterações em andamento, incluindo remoção do layout, realocação do tema e arquivos ainda não rastreados pelo Git. Não restaurar nem remover esses arquivos automaticamente.
-- O guia visual existe, mas contém referência antiga a `CONTEXT.md` e menção à imagem `assets/images/logo_plus_name.png`, ausente neste repositório. Também descreve componentes e navegação de uma entrega anterior que não estão comprovados aqui. O contexto canônico é este arquivo; o guia visual não foi alterado nesta entrega.
-- Não foi encontrado `Plano.md` nesta inspeção. Decisões históricas citadas pelo responsável são registradas como fornecidas por ele, não como documento conferido.
-
-### Verificações desta entrega documental
-
-- Typecheck executado com o TypeScript local (`tsc --noEmit`): a primeira execução encontrou 13 diagnósticos preexistentes, incluindo os módulos ausentes acima e parâmetro `operation` implicitamente tipado como `any` no provedor então presente. Após a mudança observada na árvore de arquivos, a nova execução **falhou com um diagnóstico: `react-native-paper` ausente no import do tema**. A redução de erros decorre da remoção dos arquivos, não de correções realizadas nesta entrega documental.
-- Lint: **bloqueado antes da execução**. Não há configuração ESLint na raiz nem executável local instalado. A implementação local do comando Expo foi inspecionada e tenta configurar/instalar dependências nessa situação. Não foi executada essa instalação automática.
-- Esses resultados não autorizam correções de código nesta atividade. Resolver a preparação e os erros em pequenas atividades acordadas, sem declarar o aplicativo validado.
+O [GUIA.md](GUIA.md) organiza os módulos e registra o histórico de aprendizagem. Seus registros datados são retratos das atividades, não necessariamente do estado atual. Antes de afirmar que uma etapa está concluída, confira os critérios, o código e as verificações relevantes junto ao responsável.
 
 ## 7. Decisões pendentes e momento de definição
 
 | Pendência | Definir antes de |
 | --- | --- |
-| Preparação de lint, dependências ausentes e compilação Android | Validar as primeiras implementações; instalações dependem de autorização. |
-| Campos e obrigatoriedade de talhões, planos, atividades e insumos | Implementar o respectivo formulário e contrato. |
-| E-mail normalizado e ciclo de vida do perfil local | Implementar o acesso local. |
-| Política decimal completa e unidades | Implementar cálculos e lançamentos. |
+| Campos e obrigatoriedade de planos, atividades e insumos | Implementar o respectivo formulário e contrato. |
+| Política decimal de custos e unidades | Implementar cálculos e lançamentos. |
 | Exclusão de atividade com lançamento | Disponibilizar essa operação. |
-| Calendário e regras de lembretes | Implementar o módulo 10. |
-| Limites e política de arquivos/fotos | Implementar captura e persistência de fotos. |
+| Calendário e regras de lembretes | Implementar essas funcionalidades. |
+| Limites e política de arquivos e fotos | Implementar captura e persistência de fotos. |
 | Autenticação, sessão remota, segurança e autorização | Implementar acesso remoto e APIs. |
 | Modelagem, índices, driver/ODM e hospedagem MongoDB | Implementar persistência do backend. |
-| Contratos de sincronização e transição do perfil local para conta real | Enviar dados locais ao backend; não associar automaticamente dados apenas por coincidência de e-mail. |
+| Contratos de sincronização e transição do perfil local para conta real | Enviar dados locais ao backend; não associar dados automaticamente apenas por coincidência de e-mail. |
 | Lançamento incorreto ou rejeitado e revisões rejeitadas | Liberar os respectivos fluxos de tratamento. |
-
-## 8. Progresso confirmado em 18/10/2026
-
-- O responsável informou que concluiu o módulo 0 — Produto e diagnóstico. Essa conclusão registra a etapa de aprendizagem e diagnóstico, não o funcionamento do aplicativo.
-- Confirmou que nesta primeira versão haverá apenas seleção de perfil por e-mail. Autenticação definitiva, backend e sincronização permanecem para etapas posteriores; a seleção local não comprova identidade.
-- Não houve novas decisões de produto nem mudanças nas regras durante o módulo. As pendências da seção 7 continuam abertas.
-- Os bloqueios de preparação não foram resolvidos. A conferência do repositório confirmou que `src/` contém somente `src/theme/theme.ts`, sem telas, layout ou provedor. O tema validado permanece preservado.
-- Na conferência desta atualização documental, a verificação de tipos continuou falhando apenas pela ausência de `react-native-paper`. O lint permaneceu bloqueado por falta de executável local e configuração; nenhuma instalação ou alteração de código foi realizada.
-
-O próximo passo de aprendizagem é a atividade 1.1 — Ler TypeScript, do [guia](guia.md). A preparação da base executável será tratada nas atividades acordadas do módulo 1, com autorização prévia para instalações.
