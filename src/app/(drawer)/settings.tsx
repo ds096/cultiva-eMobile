@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Button, ScrollView, View } from "react-native";
 import { Text } from "react-native-paper";
-import { useProfile } from "../context/ProfileContext";
-import { theme } from "../theme/theme";
+import { useProfile } from "../../context/ProfileContext";
+import { theme } from "../../theme/theme";
 
 export default function SettingsScreen() {
   // A operação atualiza armazenamento e estado compartilhado.

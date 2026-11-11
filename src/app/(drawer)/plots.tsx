@@ -8,9 +8,9 @@ import {
   Button,
 } from "react-native";
 import { useFocusEffect, router } from "expo-router";
-import { Plot, getCurrentRevision } from "../domain/plot";
-import { useProfile } from "../context/ProfileContext";
-import { plotRepository } from "../repositories/plotRepository";
+import { Plot, getCurrentRevision } from "../../domain/plot";
+import { useProfile } from "../../context/ProfileContext";
+import { plotRepository } from "../../repositories/plotRepository";
 
 type LoadStatus = "loading" | "ready" | "error";
 

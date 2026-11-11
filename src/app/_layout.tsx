@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 // Define a disponibilidade das telas a partir da seleção local de perfil.
 function Navigation() {
-  const { email, restorationStatus, restoreProfile } = useProfile();
+  const { email, restorationStatus } = useProfile();
 
   if (restorationStatus !== "ready") {
     return (
@@ -44,17 +44,12 @@ function Navigation() {
       <Stack.Protected guard={!email} redirectTo="/plots">
         <Stack.Screen name="index" options={{ headerShown: false }} />
       </Stack.Protected>
-
       <Stack.Protected guard={!!email} redirectTo="/">
-        <Stack.Screen name="plots" options={{ title: "Meus Talhões" }} />
+        <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
         <Stack.Screen
           name="plot/[id]"
           options={{ title: "Detalhes do talhão" }}
         />
-        <Stack.Screen name="calendar" options={{ title: "Calendário" }} />
-        <Stack.Screen name="supplies" options={{ title: "Insumos" }} />
-        <Stack.Screen name="plans" options={{ title: "Planos de Atividade" }} />
-        <Stack.Screen name="settings" options={{ title: "Configurações" }} />
         <Stack.Screen name="createPlan" options={{ title: "Criar Plano" }} />
         <Stack.Screen name="createPlot" options={{ title: "Criar Talhão" }} />
       </Stack.Protected>

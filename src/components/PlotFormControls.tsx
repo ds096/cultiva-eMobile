@@ -1,3 +1,4 @@
+import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
 import { StyleSheet, View, useWindowDimensions } from "react-native";
 import {
   ActivityIndicator,
@@ -101,7 +102,7 @@ type ButtonProps = {
   accessibilityLabel?: string;
 };
 
-// Desenha a lixeira com formas nativas: a base atual não possui fonte de ícones.
+// Usa o ícone de lixeira da biblioteca adotada no projeto.
 // O botão do Paper mantém feedback de toque e o nome da cultura para o TalkBack.
 export function PlotRemoveButton({
   cropName,
@@ -114,18 +115,8 @@ export function PlotRemoveButton({
 }) {
   return (
     <IconButton
-      icon={({ color }) => (
-        <View style={styles.trashIcon} accessible={false}>
-          <View style={[styles.trashHandle, { borderColor: color }]} />
-          <View style={[styles.trashLid, { backgroundColor: color }]} />
-          <View style={[styles.trashBin, { borderColor: color }]} />
-          <View
-            style={[styles.trashLine, { left: 9, backgroundColor: color }]}
-          />
-          <View
-            style={[styles.trashLine, { left: 13, backgroundColor: color }]}
-          />
-        </View>
+      icon={({ color, size }) => (
+        <MaterialDesignIcons name="delete-outline" color={color} size={size} />
       )}
       size={24}
       iconColor={tokens.color.error}
@@ -190,43 +181,6 @@ const styles = StyleSheet.create({
     width: tokens.size.touch,
     height: tokens.size.touch,
     margin: 0,
-  },
-  trashIcon: { width: 24, height: 24 },
-  trashHandle: {
-    position: "absolute",
-    top: 1,
-    left: 9,
-    width: 6,
-    height: 4,
-    borderWidth: 2,
-    borderBottomWidth: 0,
-    borderTopLeftRadius: 1,
-    borderTopRightRadius: 1,
-  },
-  trashLid: {
-    position: "absolute",
-    top: 4,
-    left: 3,
-    width: 18,
-    height: 2,
-    borderRadius: 1,
-  },
-  trashBin: {
-    position: "absolute",
-    top: 7,
-    left: 5,
-    width: 14,
-    height: 15,
-    borderWidth: 2,
-    borderBottomLeftRadius: 2,
-    borderBottomRightRadius: 2,
-  },
-  trashLine: {
-    position: "absolute",
-    top: 10,
-    width: 2,
-    height: 8,
-    borderRadius: 1,
   },
   field: { gap: tokens.space.sm },
   input: { backgroundColor: tokens.color.surface, fontSize: 16 },

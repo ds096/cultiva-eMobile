@@ -26,7 +26,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#F7FAF7"
         }
-      ]
+      ],
+      "@react-native-vector-icons/material-design-icons"
     ]
   }
 }

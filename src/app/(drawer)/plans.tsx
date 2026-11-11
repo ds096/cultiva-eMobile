@@ -1,8 +1,7 @@
 import { View } from "react-native";
 import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Menu from "../components/Menu";
-import { theme, tokens } from "../theme/theme";
+import { theme, tokens } from "../../theme/theme";
 
 // Tela provisória: centraliza o aviso na área disponível acima do menu fixo.
 export default function PlansScreen() {

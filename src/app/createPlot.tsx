@@ -40,7 +40,7 @@ type Field = keyof typeof emptyFields;
 type FormErrors = Partial<Record<Field | "crops", string>>;
 type Feedback = { kind: "success" | "error"; message: string };
 // O aviso geral é temporário; os erros dos campos têm um estado independente.
-const feedbackDuration = 5000;
+const feedbackDuration = 4000;
 
 // Cadastro local: valida antes de gravar e só limpa o formulário após confirmação.
 export default function CreatePlotScreen() {

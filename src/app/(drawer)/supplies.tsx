@@ -1,10 +1,10 @@
 import { View } from "react-native";
 import { Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { theme, tokens } from "../theme/theme";
+import { theme, tokens } from "../../theme/theme";
 
-// Tela provisória: centraliza o aviso na área disponível.
-export default function CalendarScreen() {
+// Tela provisória de Insumos (/supplies): centraliza o aviso na tela.
+export default function SuppliesScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <SafeAreaView

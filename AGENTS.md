@@ -23,6 +23,7 @@ Aplicativo de gestão agrícola para produtores, desenvolvido com Expo, React Na
 - Preserve os dados locais e suas chaves; mudanças de formato precisam de migração e tratamento de erro explícitos. Use dados de teste separados dos perfis reais.
 - Para alterações em APIs Expo ou React Native, confira a versão no `package.json` e consulte a documentação correspondente. Módulos nativos exigem nova compilação do aplicativo para serem incorporados.
 - Configure alterações nativas por `app.json` e plugins; trate diretórios gerados pelo Prebuild como artefatos gerados. Preserve a identidade Android existente salvo solicitação explícita.
+- Para ícones, use `import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";`.
 - Interface em português, acessível, com suporte a teclado, áreas seguras e fontes ampliadas. Considere os estados de carregamento, vazio, erro e salvamento aplicáveis.
 
 ## Verificação
