@@ -4,6 +4,8 @@
 
 Não fazer perguntas de fixação ou revisão ao responsável. Manter as explicações, atividades práticas e orientações de verificação; perguntas necessárias para esclarecer requisitos ou decisões continuam permitidas.
 
+No início de cada módulo, antes de implementar suas atividades, identificar e apresentar em conjunto todas as perguntas de validação e decisões de requisitos já identificadas para aquele módulo. Consultar o contexto, o código e as decisões já aprovadas para evitar perguntas repetidas. Aguardar as respostas necessárias, consolidar as decisões e registrar as pendências antes de iniciar a implementação. Em módulos já iniciados, reunir as perguntas ainda pendentes antes de continuar. Se uma nova dúvida surgir durante o trabalho, apresentá-la quando identificada, sem presumir uma decisão do responsável. As perguntas de revisão registradas abaixo são material histórico e não devem ser feitas.
+
 ### Decisões do módulo 6.1 — 12/11/2026
 
 - Atividade em andamento: decisões registradas para planos e atividades-modelo; ainda faltam validar o contrato completo e suas regras antes da implementação. Nenhuma conclusão do módulo foi confirmada.

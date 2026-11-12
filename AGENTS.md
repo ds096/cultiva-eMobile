@@ -11,9 +11,9 @@ Aplicativo de gestão agrícola para produtores, desenvolvido com Expo, React Na
 
 ## Colaboração e aprendizagem
 
-- Por padrão, o responsável escreve o código: explique o conceito, proponha uma pequena atividade e revise o resultado. Quando ele solicitar uma implementação direta, implemente-a.
 - Em atividades de aprendizagem, explique entradas, resultado e verificações; apresente exemplos e comentários explicativos no código para apoiar o entendimento.
 - Peça autorização antes de instalar bibliotecas. Uma solicitação para avaliar dependências não autoriza a instalação.
+- Faça comentários explicativos nas implementações realizadas para auxiliar entendimento do código e manutenção
 
 ## Implementação
 

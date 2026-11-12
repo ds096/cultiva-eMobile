@@ -1,3 +1,5 @@
+import type { PlanActivity } from "./activity";
+
 export type PlanInput = Readonly<{
   name: string;
   description?: string;
@@ -8,6 +10,8 @@ export type Plan = Readonly<{
   profileEmail: string;
   name: string;
   createdAt: string;
+  // Atividades-modelo pertencem ao plano; a lista pode estar vazia.
+  activities: readonly PlanActivity[];
   description?: string;
 }>;
 

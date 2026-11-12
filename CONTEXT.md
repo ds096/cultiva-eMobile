@@ -20,6 +20,8 @@ A interface deve favorecer registros rápidos, compreensíveis e com poucos pass
 
 Este é o primeiro aplicativo do responsável. A reconstrução também é uma trilha de aprendizagem: ele escreve o código, o agente orienta e revisa, uma pequena atividade por vez. O tema já foi validado pelo responsável e deve ser preservado.
 
+No início de cada módulo, reunir em uma única apresentação as perguntas de validação e decisões de requisitos identificadas, sem repetir decisões já tomadas. Consolidar as respostas antes de implementar; em módulos em andamento, reunir primeiro as questões que ainda estiverem pendentes. Novas dúvidas identificadas durante a execução podem ser esclarecidas quando surgirem. Não fazer perguntas de fixação ou revisão. O procedimento completo está no [guia de aprendizagem](GUIA.md).
+
 ## 2. Decisões técnicas aprovadas
 
 | Tema | Decisão e limite |
@@ -151,4 +153,5 @@ O [GUIA.md](GUIA.md) organiza os módulos e registra o histórico de aprendizage
 
 ## 8. Histórico de alterações
 
+- **12/11/2026:** registrada a orientação de reunir no início de cada módulo as perguntas de validação e decisões de requisitos, com tratamento para módulos em andamento e dúvidas novas.
 - **12/11/2026:** consolidados o contrato local de talhão conferido no código e as decisões do módulo 6.1, com implementação e pendências diferenciadas; planos foram registrados como exceção à regra geral anterior de revisões.

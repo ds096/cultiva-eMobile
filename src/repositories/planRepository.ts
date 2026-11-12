@@ -1,5 +1,7 @@
 import * as Crypto from "expo-crypto";
 import { createMMKV } from "react-native-mmkv";
+import { normalizePlanActivityInput } from "../domain/activity";
+import type { PlanActivity, PlanActivityInput } from "../domain/activity";
 import { normalizePlanInput } from "../domain/plan";
 import type { Plan, PlanInput } from "../domain/plan";
 import { normalizeEmail } from "../utilities/email";
@@ -42,7 +44,40 @@ function readPlan(value: unknown, profileEmail: string): Plan {
     name: value.name,
     description: value.description,
   });
-  return { id: value.id, profileEmail, createdAt: value.createdAt, ...input };
+  // Planos antigos não possuem este campo; uma lista presente precisa ser válida.
+  if (value.activities !== undefined && !Array.isArray(value.activities)) {
+    throw new Error("Lista de atividades inválida.");
+  }
+  // Valida cada identidade e reaplica as regras de domínio aos dados persistidos.
+  const activities: PlanActivity[] = (value.activities ?? []).map(
+    (activity: unknown) => {
+      if (
+        !isRecord(activity) ||
+        typeof activity.id !== "string" ||
+        !activity.id.trim()
+      ) {
+        throw new Error("Atividade armazenada inválida.");
+      }
+      return {
+        id: activity.id,
+        ...normalizePlanActivityInput(activity as unknown as PlanActivityInput),
+      };
+    },
+  );
+  // IDs repetidos no mesmo plano impediriam identificar a atividade corretamente.
+  if (
+    new Set(activities.map((activity) => activity.id)).size !==
+    activities.length
+  ) {
+    throw new Error("IDs de atividades duplicados.");
+  }
+  return {
+    id: value.id,
+    profileEmail,
+    createdAt: value.createdAt,
+    ...input,
+    activities,
+  };
 }
 
 function save(profileEmail: string, plans: Plan[]): void {
@@ -110,6 +145,8 @@ export const planRepository = {
       id: Crypto.randomUUID(),
       profileEmail: email,
       createdAt: new Date().toISOString(),
+      // Um plano novo pode existir antes de receber atividades.
+      activities: [],
       ...normalized,
     };
     save(email, [...plans, plan]);
@@ -123,10 +160,86 @@ export const planRepository = {
     const index = plans.findIndex((plan) => plan.id === id);
     if (index === -1) throw new Error("Plano não encontrado.");
     assertUnique(plans, normalized, id);
+    // Mantém identidade, data de criação e atividades ao editar nome e descrição.
     const plan: Plan = { ...plans[index], ...normalized };
     plans[index] = plan;
     save(email, plans);
     return plan;
+  },
+
+  // Valida a entrada, associa um novo ID e salva a lista atualizada do perfil.
+  addActivity(
+    profileEmail: string,
+    planId: string,
+    input: PlanActivityInput,
+  ): PlanActivity {
+    const email = normalizeEmail(profileEmail);
+    const normalized = normalizePlanActivityInput(input);
+    const plans = planRepository.list(email);
+    const index = plans.findIndex((plan) => plan.id === planId);
+    if (index === -1) throw new Error("Plano não encontrado.");
+    // Verifica a colisão contra as atividades de todos os planos deste perfil.
+    const id = Crypto.randomUUID();
+    if (
+      plans.some((plan) =>
+        plan.activities.some((activity) => activity.id === id),
+      )
+    ) {
+      throw new Error("ID de atividade duplicado.");
+    }
+    const activity: PlanActivity = { id, ...normalized };
+    plans[index] = {
+      ...plans[index],
+      activities: [...plans[index].activities, activity],
+    };
+    save(email, plans);
+    return activity;
+  },
+
+  // Substitui os dados editáveis, preservando o ID da atividade encontrada.
+  updateActivity(
+    profileEmail: string,
+    planId: string,
+    activityId: string,
+    input: PlanActivityInput,
+  ): PlanActivity {
+    const email = normalizeEmail(profileEmail);
+    const normalized = normalizePlanActivityInput(input);
+    const plans = planRepository.list(email);
+    const index = plans.findIndex((plan) => plan.id === planId);
+    if (index === -1) throw new Error("Plano não encontrado.");
+    const activities = plans[index].activities;
+    if (!activities.some((activity) => activity.id === activityId))
+      throw new Error("Atividade não encontrada.");
+    const updated: PlanActivity = { id: activityId, ...normalized };
+    plans[index] = {
+      ...plans[index],
+      activities: activities.map((activity) =>
+        activity.id === activityId ? updated : activity,
+      ),
+    };
+    save(email, plans);
+    return updated;
+  },
+
+  // Remove somente a atividade-modelo do plano e grava a lista restante.
+  removeActivity(
+    profileEmail: string,
+    planId: string,
+    activityId: string,
+  ): void {
+    const email = normalizeEmail(profileEmail);
+    const plans = planRepository.list(email);
+    const index = plans.findIndex((plan) => plan.id === planId);
+    if (index === -1) throw new Error("Plano não encontrado.");
+    const activities = plans[index].activities;
+    if (!activities.some((activity) => activity.id === activityId))
+      throw new Error("Atividade não encontrada.");
+    plans[index] = {
+      ...plans[index],
+      activities: activities.filter((activity) => activity.id !== activityId),
+    };
+    save(email, plans);
   },
 
   remove(profileEmail: string, id: string): void {
