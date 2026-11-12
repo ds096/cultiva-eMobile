@@ -1,6 +1,6 @@
 # cultiva-e — contexto do produto
 
-Revisado em 11/11/2026. Este arquivo registra decisões de produto e pendências; consulte o código e o [guia de aprendizagem](GUIA.md) para verificar implementação e progresso.
+Revisado em 12/11/2026. Este arquivo registra decisões de produto e pendências; consulte o código e o [guia de aprendizagem](GUIA.md) para verificar implementação e progresso.
 
 Este documento reúne decisões do responsável pelo produto. Requisito aprovado não significa funcionalidade implementada. Consulte o [acordo de trabalho](AGENTS.md), a [trilha de aprendizagem](GUIA.md) e o [guia visual](GUIA-VISUAL.md).
 
@@ -37,7 +37,7 @@ Este é o primeiro aplicativo do responsável. A reconstrução também é uma t
 | Dispositivos | Um celular por produtor como premissa; sem bloqueio de login em outro aparelho. Resolução de edições concorrentes entre vários dispositivos fora do escopo inicial. |
 | Sincronização | Entre celular e backend próprio; contratos e tratamento de falhas pendentes. |
 | Fotos | Arquivo persistente no celular e armazenamento de objetos no servidor. |
-| Revisões | Exibir versão atual e preservar histórico das entidades editáveis. Lançamentos não são editáveis. |
+| Revisões | Talhões devem preservar histórico e exibir a versão atual; planos são uma exceção aprovada, sem histórico de revisões. A política das demais entidades editáveis permanece a confirmar. Lançamentos não são editáveis. |
 | Números | Decimais no domínio com política comum, strings decimais canônicas no JSON e momento documentado de arredondamento dos totais. Detalhamento pendente. |
 | Integrações | Sem APIs de terceiros no escopo inicial; a comunicação com o backend próprio continua necessária. |
 
@@ -69,11 +69,23 @@ Na etapa de aprendizagem local, o primeiro passo é selecionar um perfil por e-m
 - Permitir cadastrar, consultar e editar talhões.
 - Cada produtor acessa apenas os próprios registros, fotos e revisões na versão autenticada. Separação local por e-mail não equivale a uma barreira de segurança.
 - Talhão: nome, área em hectares e ao menos uma cultura com quantidade são obrigatórios; ano de plantio e localização são opcionais. A área aceita decimais com vírgula ou ponto na interface, deve ser finita e positiva e não tem limite fixo de casas decimais nem arredondamento automático.
-- Preservar revisões das entidades editáveis e apresentar a versão atual.
+- Preservar revisões dos talhões e apresentar a versão atual; edição e apresentação do histórico ainda precisam ser implementadas.
+
+#### Contrato local de talhão — conferido em 12/11/2026
+
+- **Identidade e dados:** `Plot` contém `id`, `profileEmail` e `revisions`; cada `PlotRevision` tem `version`, `savedAt` e `data` (`PlotInput`). Os dados são nome, área, lista de culturas, ano de plantio e localização opcionais. Cada cultura tem nome e quantidade de plantas; localização reúne latitude e longitude em graus decimais.
+- **Validação implementada:** nomes de talhão e cultura são obrigatórios após remover espaços externos; área numérica finita e positiva, sem limite fixo de casas ou arredondamento explícito; ao menos uma cultura, com quantidade inteira positiva. Ano, quando informado, deve ser inteiro seguro positivo, sem proibição de ano futuro. Latitude e longitude, quando presentes, devem ser finitas e estar entre -90 e 90 e entre -180 e 180, inclusive; zero é válido.
+- **Interface atual:** o cadastro identifica área em hectares e converte vírgula ou ponto para número. A representação usa `number` do JavaScript, sujeita à precisão numérica; não é uma string decimal canônica. O formulário não oferece localização. A política decimal geral e eventual migração continuam pendentes.
+- **Revisões:** a criação gera versão 1, instante ISO e dados normalizados; a revisão atual é o último item da lista, sem ordenação. A leitura exige histórico não vazio, versão inteira segura positiva e data interpretável, mas não verifica sequência das versões nem formato específico do instante. Não há operação de edição ou criação de novas revisões no repositório.
+- **Persistência:** MMKV `cultiva-e-talhoes`, chave `plots:` seguida do e-mail normalizado e codificado; documento JSON `{ schemaVersion: 1, plots: [...] }`. `list`, `findById` e `create` estão implementados; criação usa UUID e grava a lista do perfil. A leitura valida estrutura e regras de todas as revisões, preservando os textos armazenados; JSON inválido, versão desconhecida e dados inválidos geram erro. Ausência da chave resulta em lista vazia. O código atual substitui um array legado por documento vazio para aquele perfil, conforme comentário de descarte autorizado; isso é comportamento existente, não uma regra geral para formatos futuros. Novas mudanças de formato exigem migração e tratamento de erro explícitos.
 
 ### Planos e atividades
 
 - Planos são criados pelo produtor; não existem planos padrão fornecidos pelo sistema.
+- Decisões do módulo 6.1, ainda não implementadas: atividades-modelo ficam dentro do plano, que pode estar vazio; planos não mantêm histórico de revisões. Somente o nome da atividade-modelo é obrigatório; descrição, categoria, data inicial, duração e observações são opcionais.
+- A data inicial opcional é uma data de calendário no formato `YYYY-MM-DD`. A duração estimada é em dias e sua ausência foi proposta e aceita entre os demais campos opcionais. Quando ambas existirem, a data final será calculada; falta decidir se a contagem inclui o primeiro dia e definir validações de duração e datas antes da implementação.
+- Haverá categorias predefinidas e personalizadas. A lista inicial e a proposta de reutilização e gerenciamento das categorias personalizadas ainda precisam de definição. Prioridade está fora do escopo por enquanto.
+- Excluir uma atividade-modelo remove-a definitivamente do plano após confirmação, sem afetar cópias já importadas. As cópias independentes serão tratadas no módulo 7.
 - Um plano pode ser usado em vários talhões. A importação cria cópias independentes das atividades; alterações posteriores no plano não modificam cópias existentes.
 - Preservar referência de origem quando útil, sem substituir a cópia por referência mutável.
 - Permitir criar atividades diretamente no talhão, editar e excluir atividades planejadas, inclusive importadas.
@@ -127,7 +139,7 @@ O [GUIA.md](GUIA.md) organiza os módulos e registra o histórico de aprendizage
 
 | Pendência | Definir antes de |
 | --- | --- |
-| Campos e obrigatoriedade de planos, atividades e insumos | Implementar o respectivo formulário e contrato. |
+| Campos e validações do plano; validações de datas e duração e regras de categorias; campos de insumos | Implementar o respectivo formulário e contrato. Apenas o nome da atividade-modelo é obrigatório entre seus campos já discutidos. |
 | Política decimal de custos e unidades | Implementar cálculos e lançamentos. |
 | Exclusão de atividade com lançamento | Disponibilizar essa operação. |
 | Calendário e regras de lembretes | Implementar essas funcionalidades. |
@@ -136,3 +148,7 @@ O [GUIA.md](GUIA.md) organiza os módulos e registra o histórico de aprendizage
 | Modelagem, índices, driver/ODM e hospedagem MongoDB | Implementar persistência do backend. |
 | Contratos de sincronização e transição do perfil local para conta real | Enviar dados locais ao backend; não associar dados automaticamente apenas por coincidência de e-mail. |
 | Lançamento incorreto ou rejeitado e revisões rejeitadas | Liberar os respectivos fluxos de tratamento. |
+
+## 8. Histórico de alterações
+
+- **12/11/2026:** consolidados o contrato local de talhão conferido no código e as decisões do módulo 6.1, com implementação e pendências diferenciadas; planos foram registrados como exceção à regra geral anterior de revisões.

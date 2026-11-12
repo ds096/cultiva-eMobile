@@ -2,6 +2,16 @@
 
 ## Como usar esta trilha
 
+Não fazer perguntas de fixação ou revisão ao responsável. Manter as explicações, atividades práticas e orientações de verificação; perguntas necessárias para esclarecer requisitos ou decisões continuam permitidas.
+
+### Decisões do módulo 6.1 — 12/11/2026
+
+- Atividade em andamento: decisões registradas para planos e atividades-modelo; ainda faltam validar o contrato completo e suas regras antes da implementação. Nenhuma conclusão do módulo foi confirmada.
+- O plano pode ficar vazio, contém suas atividades e não tem histórico de revisões nem modelo padrão. Somente o nome da atividade-modelo é obrigatório; descrição, categoria, data inicial, duração e observações são opcionais.
+- Data inicial opcional em `YYYY-MM-DD`; duração estimada em dias, opcional. A data final será calculada quando ambas existirem; falta decidir se a contagem inclui o primeiro dia e validar as regras de data e duração.
+- Categorias predefinidas e personalizadas; lista inicial e proposta de reutilização e gerenciamento ainda pendentes. Prioridade fora do escopo. Exclusão definitiva de atividade-modelo após confirmação não afeta cópias já importadas, independentes no módulo 7.
+- Conferência documental: domínio e repositório de talhão consultados para atualizar o contexto. A implementação do módulo 6 não foi realizada nesta atualização.
+
 ### Reorganização da trilha e conferência da estrutura — 06/11/2026
 
 - Atividade: módulo 5 reservado a Menu e navegação, com formato e presença por tela a definir durante sua execução; Planos de manejo reinserido como módulo 6. Módulos seguintes renumerados até 14, incluindo atividades, pré-requisitos e referências ao histórico, agora na atividade 10.3.
@@ -153,7 +163,7 @@ Inspeção dos arquivos atuais. Os registros datados anteriores descrevem o esta
 | `context/ProfileContext.tsx`           | Compartilha e-mail, estado de restauração e ações `restoreProfile`, `selectProfile` e `clearProfile`. Lê o perfil na inicialização e atualiza memória após sucesso no armazenamento.                                                                                           |
 | `repositories/profileRepository.ts`    | Inicializa MMKV sob demanda; salva, recupera e remove somente a seleção do perfil. `get()` retorna `string                                                                                                                                                                     | null`; falhas de leitura são propagadas. |
 | `domain/plot.ts`                       | Define Crop, Coordinates, PlotInput, PlotRevision e Plot; normaliza e valida campos; recupera a última revisão com `getCurrentRevision`.                                                                                                                                       |
-| `repositories/plotRepository.ts`       | Lê JSON por perfil, valida documento e revisões e oferece `list` e `findById`. Ainda não oferece criação, gravação ou edição de talhões.                                                                                                                                       |
+| `repositories/plotRepository.ts`       | Lê e valida JSON por perfil e revisões; oferece `list`, `findById` e criação com gravação local. Edição ainda não está implementada. |
 | `utilities/email.ts`                   | Normalização e validação de e-mail utilizadas no acesso e na identificação local dos dados.                                                                                                                                                                                    |
 | `theme/theme.ts`                       | Tema do Paper e tokens compartilhados de cores, tipografia e medidas.                                                                                                                                                                                                          |
 
@@ -165,7 +175,7 @@ Inspeção dos arquivos atuais. Os registros datados anteriores descrevem o esta
 
 **Fluxo dos talhões:** ao receber foco, a lista obtém o e-mail pelo contexto e chama `plotRepository.list(email)`. O repositório lê a instância `cultiva-e-talhoes`, na chave formada por `plots:` e pelo e-mail normalizado codificado com `encodeURIComponent`. Converte e valida o documento com `schemaVersion: 1` e `plots`, incluindo perfil, identidade e revisões. Ausência de chave retorna lista vazia; JSON inválido ou falha de leitura gera erro. A tela mantém seu próprio estado de carregamento e dados; o contexto não armazena a lista.
 
-**Contrato dos talhões:** cada Plot contém id, profileEmail e revisões; cada revisão contém version, savedAt e data. Nome, área finita positiva e ao menos uma cultura com quantidade inteira positiva são obrigatórios; ano e localização são opcionais. Coordenadas usam latitude e longitude. A última revisão é obtida pela ordem armazenada; histórico vazio é rejeitado. Unidade e precisão da área precisam ser acordadas antes do formulário. Ter tipos e leitor de JSON não significa que cadastro e edição estejam prontos.
+**Contrato dos talhões:** cada Plot contém id, profileEmail e revisões; cada revisão contém version, savedAt e data. Nome, área finita positiva em hectares e ao menos uma cultura com quantidade inteira positiva são obrigatórios; ano e localização são opcionais. O cadastro aceita vírgula ou ponto e usa número sem limite fixo de casas ou arredondamento explícito, sujeito à precisão do JavaScript. Coordenadas usam latitude e longitude, mas não estão no formulário. A última revisão é obtida pela ordem armazenada; histórico vazio é rejeitado. Cadastro e leitura existem; edição ainda não está implementada. Detalhes e limites estão em [CONTEXT.md](CONTEXT.md).
 
 **Bloqueios e limites atuais:** referências ao AppButton inexistente em `_layout.tsx` e `settings.tsx` e ao Menu inexistente em `plans.tsx`; rota de detalhes vazia; TS7016 em `eslint.config.js:3` referente a `eslint-config-expo/flat`. Planos, atividades, insumos, lançamentos, fotos, calendário, notificações, backend e sincronização ainda não têm implementação de domínio/persistência nesta árvore. Navegação completa, fonte ampliada e TalkBack precisam de validação em aparelho. Esta atualização altera somente o guia.
 
@@ -349,27 +359,25 @@ Os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) orientaram a etapa.
 
 ## Módulo 6 — Planos de manejo
 
-**Estado:** pendente.
+**Estado:** em definição; decisões parciais da atividade 6.1 registradas em 12/11/2026. Implementação e validação do módulo pendentes.
 
 **Objetivo:** permitir que o produtor crie seus próprios modelos reutilizáveis de atividades.
 
-**Funcionalidades:** cadastrar, listar, consultar e editar planos e suas atividades-modelo, preservando revisões. Não fornecer plano padrão inicial.
+**Funcionalidades:** cadastrar, listar, consultar e editar planos e suas atividades-modelo, sem histórico de revisões. Plano vazio é permitido e não há plano padrão inicial.
 
-**Conceitos:** modelo reutilizável, identidade, revisão, composição de dados e independência entre modelo e cópias importadas.
+**Conceitos:** modelo reutilizável, identidade, composição de dados e independência entre modelo e cópias importadas.
 
-**Pré-requisitos:** módulos 4 e 5; definir campos obrigatórios, categorias, datas e duração, prioridades e tratamento de exclusão antes das respectivas implementações. Manter datas de calendário separadas de instantes de auditoria.
+**Pré-requisitos:** módulos 4 e 5; concluir campos e validações do plano, datas, duração e detalhes das categorias antes das respectivas implementações. Manter datas de calendário separadas de instantes de auditoria; prioridade permanece fora do escopo.
 
 **Pequenas atividades:**
 
-1. **6.1 — Definir o contrato:** acordar dados de plano e atividade-modelo, validações, revisões e regras de exclusão. A data final não pode anteceder a inicial quando ambas forem usadas.
-2. **6.2 — Preparar a persistência:** ler e salvar planos por perfil local, validando os dados e preservando revisões; tratar falhas sem apagar registros.
+1. **6.1 — Definir o contrato:** consolidar decisões registradas acima e acordar campos do plano, validações e contagem de dias. A data final calculada não pode anteceder a inicial.
+2. **6.2 — Preparar a persistência:** ler e salvar planos por perfil local, validando os dados sem histórico de revisões; tratar falhas sem apagar registros.
 3. **6.3 — Cadastrar e listar:** desenvolver `plans` e `createPlan` em partes, com estados vazio, validação, salvamento e erro; seguir as decisões de navegação do módulo 5.
-4. **6.4 — Gerir atividades-modelo:** adicionar, consultar e editar atividades do plano, preservando versões anteriores e aplicando somente exclusões autorizadas.
-5. **6.5 — Verificar reutilização:** conferir persistência após reinício, separação por perfil e revisões. Preparar o contrato para importação de cópias independentes no módulo 7; verificar essa independência ao integrar a importação.
+4. **6.4 — Gerir atividades-modelo:** adicionar, consultar e editar atividades do plano e confirmar antes de excluir definitivamente uma atividade-modelo.
+5. **6.5 — Verificar reutilização:** conferir persistência após reinício e separação por perfil. Preparar o contrato para importação de cópias independentes no módulo 7; verificar essa independência ao integrar a importação.
 
-**Critérios de conclusão:** o produtor consegue manter planos próprios com atividades válidas; dados persistem e revisões são preservadas. Alterações do plano não devem modificar atividades já importadas. A execução e a conclusão de atividades pertencem aos talhões, não ao modelo.
-
-**Perguntas de revisão:** o que diferencia um plano de uma atividade do talhão? Por que editar o modelo não altera uma cópia já importada? Como preservar o histórico ao editar?
+**Critérios de conclusão:** o produtor consegue manter planos próprios, inclusive vazios, com atividades válidas; dados persistem sem histórico de revisões. Alterações e exclusões no plano não devem modificar atividades já importadas. A execução e a conclusão de atividades pertencem aos talhões, não ao modelo.
 
 ## Módulo 7 — Atividades dos talhões
 
@@ -390,8 +398,6 @@ Os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) orientaram a etapa.
 
 **Critérios de conclusão:** editar o plano não altera atividades importadas; repetir uma operação não duplica cópias; nova importação intencional é distinguível. Não existe situação Iniciada nem exclusão em cascata do histórico.
 
-**Perguntas de revisão:** por que não basta guardar uma referência ao plano? Atrasada precisa ser armazenada como situação independente? Como distinguir um reenvio de uma ação nova?
-
 ## Módulo 8 — Insumos e cálculos
 
 **Objetivo:** preparar dados e cálculos antes de registrar custos de execução.
@@ -410,8 +416,6 @@ Os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) orientaram a etapa.
 4. **8.4 — Verificar cálculos:** testar os exemplos acordados, incluindo frações e unidades incompatíveis.
 
 **Critérios de conclusão:** regras numéricas documentadas e verificadas; cada aquisição é um cadastro; nenhuma baixa automática ou bloqueio por estoque calculado. Não converter unidades incompatíveis por suposição.
-
-**Perguntas de revisão:** por que representação e arredondamento afetam dinheiro? Por que esgotar um insumo não pode apagar sua participação em um lançamento antigo?
 
 ## Módulo 9 — Lançamento único
 
@@ -432,8 +436,6 @@ Os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) orientaram a etapa.
 
 **Critérios de conclusão:** uma atividade tem no máximo um lançamento; execução salva conclui a atividade; campos opcionais não impedem um registro válido. Imutabilidade vale desde o salvamento local. A proteção equivalente no backend será validada no módulo 12.
 
-**Perguntas de revisão:** desabilitar um botão basta para evitar duplicidade? Por que salvar lançamento e concluir atividade precisam ser consistentes? Qual diferença entre alterar observação e atualizar estado de envio?
-
 ## Módulo 10 — Fotos e histórico
 
 **Objetivo:** preservar evidências e consultar o trabalho realizado.
@@ -441,8 +443,6 @@ Os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) orientaram a etapa.
 **Funcionalidades:** adicionar fotos antes de salvar novos lançamentos, persistir arquivos, exibir histórico do talhão e detalhes somente para leitura.
 
 **Conceitos:** arquivo temporário versus persistente, referência a arquivo, permissão, auditoria e integridade de histórico.
-
-**Pré-requisitos:** módulo 9; definir origem das fotos, limites e tratamento de falhas. Consultar APIs atuais e obter autorização antes de instalar módulos necessários.
 
 **Pequenas atividades:**
 
@@ -467,8 +467,6 @@ Os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) orientaram a etapa.
 
 **Critérios de conclusão:** lançamentos sem foto continuam válidos; fotos sobrevivem ao reinício; insumos esgotados continuam visíveis no histórico. Não anexar ou substituir fotos de lançamento já salvo sob pretexto de completar o módulo.
 
-**Perguntas de revisão:** guardar o endereço de um arquivo temporário preserva a foto? Como consultar um lançamento se o cadastro de origem foi alterado depois?
-
 ## Módulo 11 — Calendário e lembretes
 
 **Objetivo:** tornar o planejamento consultável por data e ajudar a lembrar atividades.
@@ -487,8 +485,6 @@ Os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) orientaram a etapa.
 4. **11.4 — Agendar e reconciliar:** ajustar lembretes após edição, conclusão, exclusão permitida, saída e reinício conforme regras acordadas.
 
 **Critérios de conclusão:** calendário corresponde às atividades; reagendamento não gera lembretes duplicados; recusa ou falha não perde registros. Validar comportamento em Android e registrar limites observados, sem prometer entrega de notificação não comprovada.
-
-**Perguntas de revisão:** o calendário precisa duplicar os dados das atividades? O que fazer com um lembrete quando a atividade é concluída? Qual diferença entre agendar e comprovar que a notificação apareceu?
 
 ## Módulo 12 — Backend e autenticação
 
@@ -510,8 +506,6 @@ Os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) orientaram a etapa.
 
 **Critérios de conclusão:** testar dois produtores e impedir acesso cruzado, inclusive a fotos; rejeitar entradas inválidas; garantir unicidade e imutabilidade no servidor. Não afirmar integração completa enquanto a sincronização não existir.
 
-**Perguntas de revisão:** por que repetir validação no servidor? Como o backend distingue identidade comprovada de um campo enviado pelo celular? Que regra precisa continuar verdadeira com duas requisições simultâneas?
-
 ## Módulo 13 — Sincronização
 
 **Objetivo:** conectar o fluxo offline ao backend sem perder ou duplicar informações.
@@ -532,8 +526,6 @@ Os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) orientaram a etapa.
 
 **Critérios de conclusão:** testar queda de conexão antes e depois da aceitação, reinício durante envio, reenvio e falha isolada de foto. Não perder conteúdo nem afirmar “sincronizado” prematuramente. Conflitos entre vários celulares permanecem fora do escopo inicial.
 
-**Perguntas de revisão:** se o servidor salvou mas a resposta se perdeu, o que o celular deve fazer? Como distinguir rejeição de regra de falta de internet? Por que uma foto pendente não equivale a um registro completamente sincronizado?
-
 ## Módulo 14 — Qualidade e distribuição
 
 **Objetivo:** verificar a jornada completa e preparar uma versão Android utilizável.
@@ -552,8 +544,6 @@ Os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) orientaram a etapa.
 4. **14.4 — Preparar distribuição:** verificar lint, tipos e testes relevantes; documentar ambiente, resultados, limitações e procedimento de compilação e distribuição Android com EAS.
 
 **Critérios de conclusão:** jornada validada em dispositivo, regras críticas verificadas e bloqueios resolvidos ou explicitamente delimitados antes da distribuição. Registrar o que foi realmente testado; compilação bem-sucedida não substitui teste da experiência.
-
-**Perguntas de revisão:** quais falhas causariam perda de confiança ou dados? O que foi testado em aparelho e o que só foi inspecionado? Como uma atualização preserva registros ainda não enviados?
 
 ### Ícone de remoção de cultura — 11/11/2026
 
