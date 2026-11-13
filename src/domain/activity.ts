@@ -91,6 +91,25 @@ export function validateEstimatedDurationDays(
   return value;
 }
 
+// Soma dias de calendário em UTC para não deslocar a data por fuso horário.
+// O contrato aceita anos de 0001 a 9999; resultados fora dele são inválidos.
+export function calculatePlannedEndDate(
+  startDate?: string,
+  durationDays?: number,
+): string | undefined {
+  const start = validatePlannedStartDate(startDate);
+  const duration = validateEstimatedDurationDays(durationDays);
+  if (start === undefined || duration === undefined) return undefined;
+  const [year, month, day] = start.split("-").map(Number);
+  const date = new Date(0);
+  date.setUTCFullYear(year, month - 1, day);
+  date.setUTCDate(date.getUTCDate() + duration);
+  if (!Number.isFinite(date.getTime()) || date.getUTCFullYear() > 9999) {
+    throw new Error("A data final calculada está fora do intervalo permitido.");
+  }
+  return date.toISOString().slice(0, 10);
+}
+
 // Não atribui valor padrão: a interface deve fornecer true ou false explicitamente.
 export function validateActivityNotify(value: boolean): boolean {
   if (typeof value !== "boolean")
@@ -105,14 +124,16 @@ export function normalizePlanActivityInput(
   if (typeof input !== "object" || input === null || Array.isArray(input)) {
     throw new Error("Atividade inválida.");
   }
+  const startDate = validatePlannedStartDate(input.plannedStartDate);
+  const duration = validateEstimatedDurationDays(input.estimatedDurationDays);
+  // Verifica também se a combinação permite calcular uma data final válida.
+  calculatePlannedEndDate(startDate, duration);
   return {
     name: normalizeActivityName(input.name),
     description: normalizeOptionalText(input.description),
     category: normalizeActivityCategory(input.category),
-    plannedStartDate: validatePlannedStartDate(input.plannedStartDate),
-    estimatedDurationDays: validateEstimatedDurationDays(
-      input.estimatedDurationDays,
-    ),
+    plannedStartDate: startDate,
+    estimatedDurationDays: duration,
     notes: normalizeOptionalText(input.notes),
     notify: validateActivityNotify(input.notify),
   };

@@ -44,12 +44,11 @@ function readPlan(value: unknown, profileEmail: string): Plan {
     name: value.name,
     description: value.description,
   });
-  // Planos antigos não possuem este campo; uma lista presente precisa ser válida.
-  if (value.activities !== undefined && !Array.isArray(value.activities)) {
+  if (!Array.isArray(value.activities)) {
     throw new Error("Lista de atividades inválida.");
   }
   // Valida cada identidade e reaplica as regras de domínio aos dados persistidos.
-  const activities: PlanActivity[] = (value.activities ?? []).map(
+  const activities: PlanActivity[] = value.activities.map(
     (activity: unknown) => {
       if (
         !isRecord(activity) ||
@@ -137,16 +136,41 @@ export const planRepository = {
   },
 
   create(profileEmail: string, input: PlanInput): Plan {
+    return planRepository.createWithActivities(profileEmail, input, []);
+  },
+
+  // Valida o conjunto antes de uma única escrita do documento do perfil.
+  createWithActivities(
+    profileEmail: string,
+    input: PlanInput,
+    activities: readonly PlanActivityInput[],
+  ): Plan {
     const email = normalizeEmail(profileEmail);
     const normalized = normalizePlanInput(input);
+    if (!Array.isArray(activities))
+      throw new Error("Lista de atividades inválida.");
+    const normalizedActivities = activities.map(normalizePlanActivityInput);
     const plans = planRepository.list(email);
     assertUnique(plans, normalized);
+    const activityIds = new Set(
+      plans.flatMap((plan) => plan.activities.map((activity) => activity.id)),
+    );
+    const newActivities: PlanActivity[] = normalizedActivities.map(
+      (activity) => {
+        const id = Crypto.randomUUID();
+        if (activityIds.has(id)) throw new Error("ID de atividade duplicado.");
+        activityIds.add(id);
+        return { id, ...activity };
+      },
+    );
+    const id = Crypto.randomUUID();
+    if (plans.some((plan) => plan.id === id))
+      throw new Error("ID de plano duplicado.");
     const plan: Plan = {
-      id: Crypto.randomUUID(),
+      id,
       profileEmail: email,
       createdAt: new Date().toISOString(),
-      // Um plano novo pode existir antes de receber atividades.
-      activities: [],
+      activities: newActivities,
       ...normalized,
     };
     save(email, [...plans, plan]);

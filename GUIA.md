@@ -8,11 +8,14 @@ No início de cada módulo, antes de implementar suas atividades, identificar e 
 
 ### Decisões do módulo 6.1 — 12/11/2026
 
-- Atividade em andamento: decisões registradas para planos e atividades-modelo; ainda faltam validar o contrato completo e suas regras antes da implementação. Nenhuma conclusão do módulo foi confirmada.
+- Atividade em andamento: decisões consolidadas para planos e atividades-modelo; a conclusão do módulo ainda não foi confirmada.
 - O plano pode ficar vazio, contém suas atividades e não tem histórico de revisões nem modelo padrão. Somente o nome da atividade-modelo é obrigatório; descrição, categoria, data inicial, duração e observações são opcionais.
-- Data inicial opcional em `YYYY-MM-DD`; duração estimada em dias, opcional. A data final será calculada quando ambas existirem; falta decidir se a contagem inclui o primeiro dia e validar as regras de data e duração.
-- Categorias predefinidas e personalizadas; lista inicial e proposta de reutilização e gerenciamento ainda pendentes. Prioridade fora do escopo. Exclusão definitiva de atividade-modelo após confirmação não afeta cópias já importadas, independentes no módulo 7.
-- Conferência documental: domínio e repositório de talhão consultados para atualizar o contexto. A implementação do módulo 6 não foi realizada nesta atualização.
+- Data inicial opcional em `YYYY-MM-DD` e duração opcional em dias inteiros positivos. Quando ambas existem, a data final é a inicial mais a duração: 10/11/2026 + 3 = 13/11/2026. O cálculo aceita resultados até 9999-12-31.
+- Somente as oito categorias predefinidas em `activity.ts`; prioridade fora do escopo. Exclusão definitiva de atividade-modelo após confirmação não afeta cópias já importadas, independentes no módulo 7.
+- `PlanInput` contém nome e descrição. O cadastro previsto usa uma tela para incluir atividades opcionais e um único salvamento conjunto. O indicador `notify` continua obrigatório no contrato existente; regras de lembretes serão definidas no módulo 11.
+- Decisões de 6.3: cards com nome, descrição e ação de detalhes; tela de detalhes com atividades; após salvar, voltar à lista; reutilizar formulário preenchido para edição; confirmar exclusão definitiva e descarte de alterações.
+- `createWithActivities` valida o conjunto e grava o documento do perfil uma vez; `create` continua disponível para planos vazios. As telas e a validação no Android ainda estão pendentes.
+- Verificação automatizada local: `node --test tests/planRepository.test.cjs` cobre cálculo, criação conjunta, operações existentes, separação de perfis e falhas simuladas. O armazenamento simulado não comprova o comportamento nativo do MMKV ou a recuperação após reinício no aparelho; essas verificações continuam pendentes.
 
 ### Reorganização da trilha e conferência da estrutura — 06/11/2026
 
@@ -361,7 +364,7 @@ Os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) orientaram a etapa.
 
 ## Módulo 6 — Planos de manejo
 
-**Estado:** em definição; decisões parciais da atividade 6.1 registradas em 12/11/2026. Implementação e validação do módulo pendentes.
+**Estado:** contrato e persistência em desenvolvimento; telas e validação do módulo pendentes.
 
 **Objetivo:** permitir que o produtor crie seus próprios modelos reutilizáveis de atividades.
 
@@ -369,12 +372,12 @@ Os pontos 2, 3 e 5 de [REVISAO-PERFIL.md](REVISAO-PERFIL.md) orientaram a etapa.
 
 **Conceitos:** modelo reutilizável, identidade, composição de dados e independência entre modelo e cópias importadas.
 
-**Pré-requisitos:** módulos 4 e 5; concluir campos e validações do plano, datas, duração e detalhes das categorias antes das respectivas implementações. Manter datas de calendário separadas de instantes de auditoria; prioridade permanece fora do escopo.
+**Pré-requisitos:** módulos 4 e 5. Manter datas de calendário separadas de instantes de auditoria; prioridade permanece fora do escopo.
 
 **Pequenas atividades:**
 
-1. **6.1 — Definir o contrato:** consolidar decisões registradas acima e acordar campos do plano, validações e contagem de dias. A data final calculada não pode anteceder a inicial.
-2. **6.2 — Preparar a persistência:** ler e salvar planos por perfil local, validando os dados sem histórico de revisões; tratar falhas sem apagar registros.
+1. **6.1 — Definir o contrato:** aplicar as decisões registradas acima e verificar as validações e o cálculo de datas.
+2. **6.2 — Preparar a persistência:** ler e salvar planos por perfil local, validando plano e atividades antes de uma escrita; verificar falhas, integridade e preservação dos registros.
 3. **6.3 — Cadastrar e listar:** desenvolver `plans` e `createPlan` em partes, com estados vazio, validação, salvamento e erro; seguir as decisões de navegação do módulo 5.
 4. **6.4 — Gerir atividades-modelo:** adicionar, consultar e editar atividades do plano e confirmar antes de excluir definitivamente uma atividade-modelo.
 5. **6.5 — Verificar reutilização:** conferir persistência após reinício e separação por perfil. Preparar o contrato para importação de cópias independentes no módulo 7; verificar essa independência ao integrar a importação.

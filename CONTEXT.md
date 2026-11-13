@@ -84,9 +84,10 @@ Na etapa de aprendizagem local, o primeiro passo é selecionar um perfil por e-m
 ### Planos e atividades
 
 - Planos são criados pelo produtor; não existem planos padrão fornecidos pelo sistema.
-- Decisões do módulo 6.1, ainda não implementadas: atividades-modelo ficam dentro do plano, que pode estar vazio; planos não mantêm histórico de revisões. Somente o nome da atividade-modelo é obrigatório; descrição, categoria, data inicial, duração e observações são opcionais.
-- A data inicial opcional é uma data de calendário no formato `YYYY-MM-DD`. A duração estimada é em dias e sua ausência foi proposta e aceita entre os demais campos opcionais. Quando ambas existirem, a data final será calculada; falta decidir se a contagem inclui o primeiro dia e definir validações de duração e datas antes da implementação.
-- Haverá categorias predefinidas e personalizadas. A lista inicial e a proposta de reutilização e gerenciamento das categorias personalizadas ainda precisam de definição. Prioridade está fora do escopo por enquanto.
+- Atividades-modelo ficam dentro do plano, que pode estar vazio; planos não mantêm histórico de revisões. Nome é obrigatório; descrição, categoria, data inicial, duração e observações são opcionais. O contrato atual também exige o indicador booleano `notify`; as regras de lembretes permanecem pendentes.
+- Data inicial opcional em `YYYY-MM-DD`; duração opcional em dias inteiros positivos. Com ambos, a data final é a inicial somada à duração: 10/11/2026 + 3 dias = 13/11/2026. A data calculada deve caber entre os anos 0001 e 9999.
+- Há somente as oito categorias predefinidas em `activity.ts`. Prioridade está fora do escopo por enquanto.
+- O cadastro previsto reúne plano e atividades em uma tela e salva o conjunto de uma vez; `PlanInput` contém apenas nome e descrição. A interface ainda precisa ser implementada.
 - Excluir uma atividade-modelo remove-a definitivamente do plano após confirmação, sem afetar cópias já importadas. As cópias independentes serão tratadas no módulo 7.
 - Um plano pode ser usado em vários talhões. A importação cria cópias independentes das atividades; alterações posteriores no plano não modificam cópias existentes.
 - Preservar referência de origem quando útil, sem substituir a cópia por referência mutável.
@@ -141,7 +142,7 @@ O [GUIA.md](GUIA.md) organiza os módulos e registra o histórico de aprendizage
 
 | Pendência | Definir antes de |
 | --- | --- |
-| Campos e validações do plano; validações de datas e duração e regras de categorias; campos de insumos | Implementar o respectivo formulário e contrato. Apenas o nome da atividade-modelo é obrigatório entre seus campos já discutidos. |
+| Campos de insumos e regras de lembretes | Implementar os respectivos formulários e funcionalidades. |
 | Política decimal de custos e unidades | Implementar cálculos e lançamentos. |
 | Exclusão de atividade com lançamento | Disponibilizar essa operação. |
 | Calendário e regras de lembretes | Implementar essas funcionalidades. |
