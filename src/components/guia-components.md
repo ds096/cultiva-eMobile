@@ -7,13 +7,14 @@ Este guia descreve os componentes próprios de `src/components` e seus usos no c
 | Componente | Arquivo | Onde é chamado |
 | --- | --- | --- |
 | `AppDrawerContent` | [AppDrawerContent.tsx](AppDrawerContent.tsx) | [Layout do Drawer](../app/(drawer)/_layout.tsx) |
+| `PlotCard` | [PlotCard.tsx](PlotCard.tsx) | [Lista de talhões](../app/(drawer)/plots.tsx) |
 | `PlotCreatedFeedback` | [PlotCreatedFeedback.tsx](PlotCreatedFeedback.tsx) | [Tela de planos](../app/(drawer)/plans.tsx) |
 | `PlotFormField` | [PlotFormControls.tsx](PlotFormControls.tsx) | [Cadastro de talhão](../app/createPlot.tsx) |
 | `PlotFormButton` | [PlotFormControls.tsx](PlotFormControls.tsx) | [Cadastro de talhão](../app/createPlot.tsx) |
 | `PlotRemoveButton` | [PlotFormControls.tsx](PlotFormControls.tsx) | [Cadastro de talhão](../app/createPlot.tsx) |
 | `ProfileLanding` | [ProfileLanding.tsx](ProfileLanding.tsx) | [Tela inicial](../app/index.tsx) |
 
-`AppDrawerContent`, `PlotCreatedFeedback` e `ProfileLanding` são exportações padrão: são importados sem chaves. Os três controles de `PlotFormControls` são exportações nomeadas e usam chaves no import.
+`AppDrawerContent`, `PlotCreatedFeedback` e `ProfileLanding` são exportações padrão: são importados sem chaves. `PlotCard` e os três controles de `PlotFormControls` são exportações nomeadas e usam chaves no import.
 
 ## AppDrawerContent
 
@@ -30,6 +31,26 @@ O rodapé usa os insets inferiores e laterais para ficar dentro da área segura.
 <Drawer drawerContent={(props) => <AppDrawerContent {...props} />}>
   {/* telas do Drawer */}
 </Drawer>
+```
+
+## PlotCard
+
+**Função:** apresenta um talhão em um card com o nome, as culturas e a quantidade de plantas de cada uma. O botão “Ver detalhes” solicita à tela a abertura dos detalhes.
+
+**Entradas:**
+
+- `plot: Plot`: objeto do talhão, com seu identificador e suas revisões.
+- `onPressDetails: (id: string) => void`: função fornecida pela tela, chamada com o ID do talhão quando o botão é pressionado.
+
+**Funcionamento:** `getCurrentRevision(plot).data` obtém os dados da revisão atual. O componente percorre `crops` com `map`, formata as quantidades com `toLocaleString("pt-BR")` e usa “planta” para a quantidade 1 e “plantas” para as demais. O card usa cores, espaçamento e borda arredondada dos tokens do tema. Atualmente, o índice da lista é usado como `key` para cada cultura.
+
+Na tela de talhões, a `FlatList` entrega cada `item` ao componente. A função `handleViewDetails` recebe o ID e navega para `/plot/[id]`; o card não acessa o repositório nem executa a navegação diretamente.
+
+```tsx
+// Em src/app/(drawer)/plots.tsx, dentro da FlatList:
+renderItem={({ item }) => (
+  <PlotCard plot={item} onPressDetails={handleViewDetails} />
+)}
 ```
 
 ## PlotCreatedFeedback

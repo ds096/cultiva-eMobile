@@ -1,17 +1,13 @@
 import { useState, useCallback } from "react";
-import {
-  FlatList,
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  Button,
-} from "react-native";
+import { FlatList, Text, StyleSheet } from "react-native";
+import { Button } from "react-native-paper";
 import { useFocusEffect, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Plot, getCurrentRevision } from "../../domain/plot";
+import { Plot } from "../../domain/plot";
 import { useProfile } from "../../context/ProfileContext";
 import { plotRepository } from "../../repositories/plotRepository";
+import { PlotCard } from "../../components/PlotCard";
+import { tokens } from "../../theme/theme";
 
 type LoadStatus = "loading" | "ready" | "error";
 
@@ -53,9 +49,8 @@ export default function PlotsScreen() {
   if (status === "error") {
     return (
       <SafeAreaView edges={["left", "right", "bottom"]} style={{ flex: 1 }}>
-        {" "}
-        <Button title="Sair" onPress={handleExit} />
-        <Text>Erro ao carregar talhões.</Text>;
+        <Text>Não foi possível carregar os talhões.</Text>
+        <Button onPress={handleExit}>Sair</Button>
       </SafeAreaView>
     );
   }
@@ -72,6 +67,13 @@ export default function PlotsScreen() {
     }
   }
 
+  function handleViewDetails(id: string) {
+    router.push({
+      pathname: "/plot/[id]",
+      params: { id },
+    });
+  }
+
   return (
     <SafeAreaView edges={["left", "right", "bottom"]} style={{ flex: 1 }}>
       <FlatList
@@ -79,42 +81,18 @@ export default function PlotsScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         ListHeaderComponent={
-          <>
-            <Button title="Sair" onPress={handleExit} />
-            <Pressable
-              onPress={() => router.push("/createPlot")}
-              style={{
-                backgroundColor: "#2E7D32",
-                padding: 14,
-                borderRadius: 8,
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ color: "#FFFFFF", fontWeight: "600" }}>
-                + Adicionar talhão
-              </Text>
-            </Pressable>
-          </>
+          <Button
+            mode="contained"
+            onPress={() => router.push("/createPlot")}
+            style={styles.createButton}
+            contentStyle={styles.createButtonContent}
+          >
+            Cadastrar Novo Talhão
+          </Button>
         }
 
         renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.title}>
-              {getCurrentRevision(item).data.name}
-            </Text>
-
-            <Pressable
-              style={styles.button}
-              onPress={() =>
-                router.push({
-                  pathname: "/plot/[id]",
-                  params: { id: item.id },
-                })
-              }
-            >
-              <Text>Ver Detalhes</Text>
-            </Pressable>
-          </View>
+          <PlotCard plot={item} onPressDetails={handleViewDetails} />
         )}
         ListEmptyComponent={
           <Text>Você ainda não possui talhões cadastrados.</Text>
@@ -126,25 +104,15 @@ export default function PlotsScreen() {
 
 const styles = StyleSheet.create({
   list: {
-    padding: 16,
-    gap: 12,
+    padding: tokens.space.md,
+    gap: tokens.space.md,
   },
-  card: {
-    borderWidth: 1,
-    borderColor: "#CCCCCC",
-    borderRadius: 12,
-    padding: 16,
-    gap: 12,
+
+  createButton: {
+    borderRadius: tokens.radius.card,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  button: {
-    alignSelf: "flex-start",
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#CCCCCC",
-    borderRadius: 8,
+
+  createButtonContent: {
+    minHeight: 52,
   },
 });
