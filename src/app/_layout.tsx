@@ -48,6 +48,10 @@ function Navigation() {
           name="plot/[id]"
           options={{ title: "Detalhes do talhão" }}
         />
+        <Stack.Screen
+          name="plan/[id]"
+          options={{ title: "Detalhes do plano" }}
+        />
         <Stack.Screen name="createPlan" options={{ title: "Criar Plano" }} />
         <Stack.Screen name="createPlot" options={{ title: "Criar Talhão" }} />
       </Stack.Protected>

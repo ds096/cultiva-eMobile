@@ -5,6 +5,7 @@ import { Button, Text } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { theme, tokens } from "../../theme/theme";
 import PlotCreatedFeedback from "../../components/PlotCreatedFeedback";
+import { PlanCard } from "../../components/PlanCard";
 import { useProfile } from "../../context/ProfileContext";
 import type { Plan } from "../../domain/plan";
 import { planRepository } from "../../repositories/planRepository";
@@ -63,12 +64,12 @@ export default function PlansScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Text variant="titleMedium">{item.name}</Text>
-              {item.description ? (
-                <Text variant="bodyLarge">{item.description}</Text>
-              ) : null}
-            </View>
+            <PlanCard
+              plan={item}
+              onPressDetails={(id) =>
+                router.push({ pathname: "/plan/[id]", params: { id } })
+              }
+            />
           )}
           ListEmptyComponent={
             <Text variant="bodyLarge">
@@ -87,7 +88,10 @@ export default function PlansScreen() {
               <Text variant="bodyLarge" accessibilityRole="alert">
                 Não foi possível carregar os planos de manejo.
               </Text>
-              <Button onPress={loadPlans} contentStyle={styles.createButtonContent}>
+              <Button
+                onPress={loadPlans}
+                contentStyle={styles.createButtonContent}
+              >
                 Tentar novamente
               </Button>
             </>
@@ -119,14 +123,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: tokens.space.md,
     paddingBottom: tokens.space.md,
     gap: tokens.space.md,
-  },
-  card: {
-    backgroundColor: tokens.color.surface,
-    borderColor: tokens.color.border,
-    borderWidth: 1,
-    borderRadius: tokens.radius.card,
-    padding: tokens.space.md,
-    gap: tokens.space.sm,
   },
   status: {
     paddingHorizontal: tokens.space.md,
