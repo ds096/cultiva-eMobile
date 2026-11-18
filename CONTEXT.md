@@ -85,7 +85,7 @@ Na etapa de aprendizagem local, o primeiro passo é selecionar um perfil por e-m
 
 - Planos são criados pelo produtor; não existem planos padrão fornecidos pelo sistema.
 - Atividades-modelo ficam dentro do plano, que pode estar vazio; planos não mantêm histórico de revisões. Nome é obrigatório; descrição, categoria, data inicial, duração e observações são opcionais. O contrato atual também exige o indicador booleano `notify`; as regras de lembretes permanecem pendentes.
-- Data inicial opcional em `YYYY-MM-DD`; duração opcional em dias inteiros positivos. Com ambos, a data final é a inicial somada à duração: 10/11/2026 + 3 dias = 13/11/2026. A data calculada deve caber entre os anos 0001 e 9999.
+- Data inicial opcional em UTC à meia-noite, como `2026-11-10T00:00:00.000Z`; duração opcional em dias inteiros positivos. Dados locais antigos em `YYYY-MM-DD` são migrados preservando o dia. Com ambos, a data final é a inicial somada à duração: 10/11/2026 + 3 dias = 13/11/2026. A data calculada deve caber entre os anos 0001 e 9999.
 - Há somente as oito categorias predefinidas em `activity.ts`. Prioridade está fora do escopo por enquanto.
 - O cadastro previsto reúne plano e atividades em uma tela e salva o conjunto de uma vez; `PlanInput` contém apenas nome e descrição. A interface ainda precisa ser implementada.
 - Excluir uma atividade-modelo remove-a definitivamente do plano após confirmação, sem afetar cópias já importadas. As cópias independentes serão tratadas no módulo 7.

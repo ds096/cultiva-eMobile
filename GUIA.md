@@ -10,7 +10,7 @@ No início de cada módulo, antes de implementar suas atividades, identificar e 
 
 - Atividade em andamento: decisões consolidadas para planos e atividades-modelo; a conclusão do módulo ainda não foi confirmada.
 - O plano pode ficar vazio, contém suas atividades e não tem histórico de revisões nem modelo padrão. Somente o nome da atividade-modelo é obrigatório; descrição, categoria, data inicial, duração e observações são opcionais.
-- Data inicial opcional em `YYYY-MM-DD` e duração opcional em dias inteiros positivos. Quando ambas existem, a data final é a inicial mais a duração: 10/11/2026 + 3 = 13/11/2026. O cálculo aceita resultados até 9999-12-31.
+- Data inicial opcional em UTC à meia-noite, como `2026-11-10T00:00:00.000Z`, e duração opcional em dias inteiros positivos. Dados antigos em `YYYY-MM-DD` são migrados sem mudar o dia. Quando ambas existem, a data final é a inicial mais a duração: 10/11/2026 + 3 = 13/11/2026. O cálculo aceita resultados até 9999-12-31.
 - Somente as oito categorias predefinidas em `activity.ts`; prioridade fora do escopo. Exclusão definitiva de atividade-modelo após confirmação não afeta cópias já importadas, independentes no módulo 7.
 - `PlanInput` contém nome e descrição. O cadastro previsto usa uma tela para incluir atividades opcionais e um único salvamento conjunto. O indicador `notify` continua obrigatório no contrato existente; regras de lembretes serão definidas no módulo 11.
 - Decisões de 6.3: cards com nome, descrição e ação de detalhes; tela de detalhes com atividades; após salvar, voltar à lista; reutilizar formulário preenchido para edição; confirmar exclusão definitiva e descarte de alterações.

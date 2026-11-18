@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ComponentRef } from "react";
 import {
   Alert,
@@ -11,6 +11,11 @@ import {
   View,
 } from "react-native";
 import { Switch, Text } from "react-native-paper";
+import {
+  DatePickerModal,
+  pt,
+  registerTranslation,
+} from "react-native-paper-dates";
 import { MaterialDesignIcons } from "@react-native-vector-icons/material-design-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, usePreventRemove } from "expo-router";
@@ -35,6 +40,8 @@ import {
 } from "../components/FormControls";
 import { theme, tokens } from "../theme/theme";
 
+registerTranslation("pt", pt);
+
 const emptyActivity = {
   name: "",
   startDate: "",
@@ -47,7 +54,7 @@ type ActivityFields = typeof emptyActivity;
 type ActivityErrors = Partial<Record<keyof ActivityFields, string>>;
 type DraftActivity = { id: string; input: PlanActivityInput };
 
-// A interface usa DD/MM/AAAA; o domínio valida e armazena YYYY-MM-DD.
+// A interface usa DD/MM/AAAA; o domínio normaliza o dia para meia-noite UTC.
 function toDomainDate(value: string): string | undefined {
   if (!value.trim()) return undefined;
   const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value.trim());
@@ -55,13 +62,32 @@ function toDomainDate(value: string): string | undefined {
   return validatePlannedStartDate(`${match[3]}-${match[2]}-${match[1]}`);
 }
 function formatDate(value: string): string {
-  return value.split("-").reverse().join("/");
+  return value.slice(0, 10).split("-").reverse().join("/");
+}
+
+// Trabalha com componentes locais para evitar mudanças de dia por fuso horário.
+function dateFromDisplay(value: string): Date | undefined {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value);
+  if (!match) return undefined;
+  const date = new Date(0);
+  date.setFullYear(Number(match[3]), Number(match[2]) - 1, Number(match[1]));
+  date.setHours(12, 0, 0, 0);
+  return date;
+}
+
+function dateToDisplay(date: Date): string {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear()).padStart(4, "0");
+  return `${day}/${month}/${year}`;
 }
 
 export default function CreatePlanScreen() {
   const { email } = useProfile();
   const headerHeight = useHeaderHeight();
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [dateOpen, setDateOpen] = useState(false);
+  const [guidedEntry, setGuidedEntry] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [nameError, setNameError] = useState("");
@@ -76,6 +102,43 @@ export default function CreatePlanScreen() {
   const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
   const descriptionRef = useRef<FormInput>(null);
   const activityNameRef = useRef<FormInput>(null);
+  const activityDurationRef = useRef<FormInput>(null);
+  const activityNotesRef = useRef<FormInput>(null);
+  const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Cancela transições pendentes ao sair da tela, evitando abrir modais atrasados.
+  useEffect(
+    () => () => {
+      if (transitionTimer.current) clearTimeout(transitionTimer.current);
+    },
+    [],
+  );
+
+  function afterModalClose(action: () => void) {
+    if (transitionTimer.current) clearTimeout(transitionTimer.current);
+    // Aguarda o fechamento do modal nativo antes de abrir outro ou mostrar o teclado.
+    transitionTimer.current = setTimeout(() => {
+      transitionTimer.current = null;
+      action();
+    }, 300);
+  }
+  function cancelGuidedEntry() {
+    if (transitionTimer.current) clearTimeout(transitionTimer.current);
+    transitionTimer.current = null;
+    setGuidedEntry(false);
+  }
+  function finishCategory() {
+    setCategoryOpen(false);
+    if (guidedEntry) afterModalClose(() => setDateOpen(true));
+  }
+  function finishDate() {
+    setDateOpen(false);
+    if (guidedEntry) {
+      afterModalClose(() => {
+        setGuidedEntry(false);
+        activityDurationRef.current?.focus();
+      });
+    }
+  }
   // Detecta campos preenchidos para evitar perder uma atividade não adicionada.
   const hasPendingActivity = Object.values(activity).some((value) =>
     typeof value === "string" ? value.trim() !== "" : value,
@@ -309,11 +372,18 @@ export default function CreatePlanScreen() {
               <FormField
                 id="activity-name"
                 inputRef={activityNameRef}
-                label="Nome da atividade"
+                label="Nome"
                 value={activity.name}
                 onChangeText={(value) => updateActivity("name", value)}
                 error={activityErrors.name}
                 editable={!saving}
+                returnKeyType="next"
+                submitBehavior="submit"
+                onSubmitEditing={() => {
+                  Keyboard.dismiss();
+                  setGuidedEntry(true);
+                  setCategoryOpen(true);
+                }}
               />
               <View style={styles.categoryField}>
                 <Text variant="labelLarge">Categoria</Text>
@@ -322,6 +392,7 @@ export default function CreatePlanScreen() {
                   style={styles.categoryControl}
                   onPress={() => {
                     Keyboard.dismiss();
+                    cancelGuidedEntry();
                     setCategoryOpen(true);
                   }}
                   disabled={saving}
@@ -355,8 +426,11 @@ export default function CreatePlanScreen() {
               <Modal
                 visible={categoryOpen}
                 transparent
-                animationType="fade"
-                onRequestClose={() => setCategoryOpen(false)}
+                animationType={guidedEntry ? "none" : "fade"}
+                onRequestClose={() => {
+                  setCategoryOpen(false);
+                  cancelGuidedEntry();
+                }}
               >
                 <SafeAreaView
                   style={styles.modalBackdrop}
@@ -365,7 +439,10 @@ export default function CreatePlanScreen() {
                   {/* A área externa fecha o modal sem interferir nos toques da lista. */}
                   <Pressable
                     style={StyleSheet.absoluteFill}
-                    onPress={() => setCategoryOpen(false)}
+                    onPress={() => {
+                      setCategoryOpen(false);
+                      cancelGuidedEntry();
+                    }}
                     accessibilityRole="button"
                     accessibilityLabel="Fechar seleção de categoria"
                   />
@@ -382,7 +459,7 @@ export default function CreatePlanScreen() {
                           }}
                           onPress={() => {
                             updateActivity("category", category);
-                            setCategoryOpen(false);
+                            finishCategory();
                           }}
                         >
                           <Text
@@ -404,31 +481,92 @@ export default function CreatePlanScreen() {
                   </View>
                 </SafeAreaView>
               </Modal>
-              <FormField
-                id="activity-start"
-                label="Data inicial"
-                hint="Formato DD/MM/AAAA, por exemplo 10/11/2026."
-                placeholder="DD/MM/AAAA"
-                value={activity.startDate}
-                onChangeText={(value) => updateActivity("startDate", value)}
-                error={activityErrors.startDate}
-                editable={!saving}
+              <View style={styles.categoryField}>
+                <Text variant="labelLarge">Data inicial</Text>
+                <Pressable
+                  testID="activity-start"
+                  style={styles.categoryControl}
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    cancelGuidedEntry();
+                    setDateOpen(true);
+                  }}
+                  disabled={saving}
+                  accessibilityRole="button"
+                  accessibilityLabel="Data inicial"
+                  accessibilityValue={{
+                    text: activity.startDate || "Nenhuma data selecionada",
+                  }}
+                  accessibilityHint="Abre o calendário para selecionar uma data"
+                  accessibilityState={{ disabled: saving, expanded: dateOpen }}
+                >
+                  <Text
+                    variant="bodyLarge"
+                    style={[
+                      styles.categoryValue,
+                      !activity.startDate && styles.secondary,
+                    ]}
+                  >
+                    {activity.startDate || "Selecione uma data"}
+                  </Text>
+                  <MaterialDesignIcons
+                    name="calendar"
+                    size={24}
+                    color={tokens.color.textSecondary}
+                  />
+                </Pressable>
+                {activityErrors.startDate ? (
+                  <Text
+                    variant="bodyMedium"
+                    accessibilityRole="alert"
+                    accessibilityLiveRegion="polite"
+                    style={styles.error}
+                  >
+                    {activityErrors.startDate}
+                  </Text>
+                ) : null}
+              </View>
+              <DatePickerModal
+                locale="pt"
+                mode="single"
+                visible={dateOpen}
+                animationType={guidedEntry ? "none" : "slide"}
+                date={dateFromDisplay(activity.startDate)}
+                allowEditing={false}
+                // A biblioteca interpreta anos de 1 a 99 como 1901 a 1999.
+                startYear={100}
+                endYear={9999}
+                onDismiss={() => {
+                  setDateOpen(false);
+                  cancelGuidedEntry();
+                }}
+                onConfirm={({ date }) => {
+                  if (date) updateActivity("startDate", dateToDisplay(date));
+                  finishDate();
+                }}
               />
               <FormField
                 id="activity-duration"
+                inputRef={activityDurationRef}
                 label="Duração em dias"
                 keyboardType="number-pad"
                 value={activity.duration}
                 onChangeText={(value) => updateActivity("duration", value)}
                 error={activityErrors.duration}
                 editable={!saving}
+                returnKeyType="next"
+                submitBehavior="submit"
+                onSubmitEditing={() => activityNotesRef.current?.focus()}
               />
               <FormField
                 id="activity-notes"
+                inputRef={activityNotesRef}
                 label="Observações"
                 value={activity.notes}
                 onChangeText={(value) => updateActivity("notes", value)}
                 editable={!saving}
+                returnKeyType="done"
+                submitBehavior="blurAndSubmit"
               />
               <View style={styles.switchRow}>
                 <Text variant="bodyLarge" style={styles.sectionTitle}>
@@ -450,45 +588,38 @@ export default function CreatePlanScreen() {
               <Text variant="titleMedium" accessibilityRole="header">
                 Atividades adicionadas ({activities.length})
               </Text>
-              {activities.map((item) => {
-                const endDate = calculatePlannedEndDate(
-                  item.input.plannedStartDate,
-                  item.input.estimatedDurationDays,
-                );
-                return (
-                  <View key={item.id} style={styles.activityCard}>
-                    <Text variant="titleMedium">{item.input.name}</Text>
-                    {item.input.category ? (
-                      <Text variant="bodyMedium">{item.input.category}</Text>
-                    ) : null}
-                    {item.input.plannedStartDate ? (
-                      <Text variant="bodyLarge">
-                        Início: {formatDate(item.input.plannedStartDate)}
-                      </Text>
-                    ) : null}
-                    {item.input.estimatedDurationDays ? (
-                      <Text variant="bodyLarge">
-                        Duração: {item.input.estimatedDurationDays} dia(s)
-                      </Text>
-                    ) : null}
-                    {endDate ? (
-                      <Text variant="bodyLarge">
-                        Término previsto: {formatDate(endDate)}
-                      </Text>
-                    ) : null}
-                    {item.input.notes ? (
-                      <Text variant="bodyLarge">{item.input.notes}</Text>
-                    ) : null}
-                    <FormButton
-                      label="Remover atividade"
-                      accessibilityLabel={`Remover atividade ${item.input.name}`}
-                      variant="remove"
-                      onPress={() => handleRemoveActivity(item)}
-                      disabled={saving}
-                    />
-                  </View>
-                );
-              })}
+              {activities.map((item) => (
+                <View key={item.id} style={styles.activityCard}>
+                  <Text variant="bodyLarge">Nome: {item.input.name}</Text>
+                  {item.input.category ? (
+                    <Text variant="bodyLarge">
+                      Categoria: {item.input.category}
+                    </Text>
+                  ) : null}
+                  {item.input.plannedStartDate ? (
+                    <Text variant="bodyLarge">
+                      Início: {formatDate(item.input.plannedStartDate)}
+                    </Text>
+                  ) : null}
+                  {item.input.estimatedDurationDays ? (
+                    <Text variant="bodyLarge">
+                      Duração: {item.input.estimatedDurationDays} dia(s)
+                    </Text>
+                  ) : null}
+                  {item.input.notes ? (
+                    <Text variant="bodyLarge">
+                      Observações: {item.input.notes}
+                    </Text>
+                  ) : null}
+                  <FormButton
+                    label="Remover atividade"
+                    accessibilityLabel={`Remover atividade ${item.input.name}`}
+                    variant="remove"
+                    onPress={() => handleRemoveActivity(item)}
+                    disabled={saving}
+                  />
+                </View>
+              ))}
             </View>
             <FormButton
               label={saving ? "Salvando plano..." : "Salvar plano"}

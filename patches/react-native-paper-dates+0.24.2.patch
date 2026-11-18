@@ -1,0 +1,436 @@
+diff --git a/node_modules/react-native-paper-dates/lib/commonjs/Date/DatePickerModal.js b/node_modules/react-native-paper-dates/lib/commonjs/Date/DatePickerModal.js
+index 58b8cb0..6cfcaf1 100644
+--- a/node_modules/react-native-paper-dates/lib/commonjs/Date/DatePickerModal.js
++++ b/node_modules/react-native-paper-dates/lib/commonjs/Date/DatePickerModal.js
+@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
+ exports.DatePickerModal = DatePickerModal;
+ exports.default = void 0;
+ var _reactNative = require("react-native");
++var _safeArea = require("react-native-safe-area-context");
+ var _reactNativePaper = require("react-native-paper");
+ var _DatePickerModalContent = _interopRequireDefault(require("./DatePickerModalContent"));
+ var _react = require("react");
+@@ -54,6 +55,7 @@ function DatePickerModal(props) {
+     height: lastCalendarLayout.height
+   } : undefined, [lastCalendarLayout, windowKey]);
+   const theme = (0, _reactNativePaper.useTheme)();
++  const insets = (0, _safeArea.useSafeAreaInsets)();
+   const isLargeScreen = (0, _utils.useIsLargeScreen)();
+   const shouldUseSheet = _reactNative.Platform.OS === 'ios' && (presentationStyle === 'pageSheet' || presentationStyle === 'formSheet');
+   const useFormSheet = shouldUseSheet && isLargeScreen;
+@@ -77,16 +79,16 @@ function DatePickerModal(props) {
+           }]
+         })
+       }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactNative.View, {
+-        style: [_reactNative.StyleSheet.absoluteFill, styles.modalRoot],
++        style: [_reactNative.StyleSheet.absoluteFill, styles.modalRoot, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 16, paddingLeft: insets.left + 16, paddingRight: insets.right + 16 }],
+         pointerEvents: "box-none",
+         children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactNative.View, {
+           style: [styles.modalContent, {
+             backgroundColor: theme.colors.elevation.level3
+-          }, isLargeScreen ? useFormSheet ? styles.modalContentFormSheet : styles.modalContentBig : null],
++          }, useFormSheet ? styles.modalContentFormSheet : styles.modalContentBig],
+           children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_DatePickerModalContent.default, {
+             ...rest,
+             inputEnabled: inputEnabled,
+-            disableSafeTop: disableStatusBarPadding,
++            disableSafeTop: true,
+             disableStatusBar: disableStatusBar,
+             statusBarOnTopOfBackdrop: isSheet || statusBarOnTopOfBackdrop,
+             withDateFormatInLabel: props.withDateFormatInLabel,
+@@ -106,8 +108,10 @@ const styles = _reactNative.StyleSheet.create({
+     minHeight: 0
+   },
+   modalContentBig: {
++    flex: 0,
++    height: '85%',
+     maxWidth: 400,
+-    maxHeight: 600,
++    maxHeight: 500,
+     borderRadius: 28,
+     width: '100%',
+     overflow: 'hidden'
+diff --git a/node_modules/react-native-paper-dates/lib/commonjs/Date/DatePickerModalContent.js b/node_modules/react-native-paper-dates/lib/commonjs/Date/DatePickerModalContent.js
+index 7ac8a8b..a60f44a 100644
+--- a/node_modules/react-native-paper-dates/lib/commonjs/Date/DatePickerModalContent.js
++++ b/node_modules/react-native-paper-dates/lib/commonjs/Date/DatePickerModalContent.js
+@@ -99,14 +99,14 @@ function DatePickerModalContent(props) {
+       width,
+       height
+     } = event.nativeEvent.layout;
+-    const calendarWidth = width - insets.left - insets.right;
++    const calendarWidth = width;
+     if (onCalendarLayout && calendarWidth > 0 && height > 0) {
+       onCalendarLayout({
+         width: calendarWidth,
+         height
+       });
+     }
+-  }, [onCalendarLayout, insets.left, insets.right]);
++  }, [onCalendarLayout]);
+   return /*#__PURE__*/(0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
+     children: [/*#__PURE__*/(0, _jsxRuntime.jsxs)(_DatePickerModalHeaderBackground.default, {
+       disableWeekDays: disableWeekDays,
+@@ -123,7 +123,7 @@ function DatePickerModalContent(props) {
+         uppercase: props.uppercase ?? defaultUppercase,
+         closeIcon: props.closeIcon,
+         disableWeekDays: disableWeekDays
+-      }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_DatePickerModalContentHeader.default, {
++      }), props.allowEditing !== false ? /*#__PURE__*/(0, _jsxRuntime.jsx)(_DatePickerModalContentHeader.default, {
+         state: state,
+         mode: mode,
+         collapsed: collapsed,
+@@ -140,11 +140,10 @@ function DatePickerModalContent(props) {
+         calendarIcon: props.calendarIcon,
+         allowEditing: props.allowEditing ?? true,
+         disableWeekDays: disableWeekDays
+-      })]
++      }) : null]
+     }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactNative.View, {
+       style: [_styles.sharedStyles.root, _styles.sharedStyles.minHeightZero, {
+-        paddingLeft: insets.left,
+-        paddingRight: insets.right
++        
+       }],
+       onLayout: _reactNative.Platform.OS === 'web' ? undefined : onCalendarContainerLayout,
+       children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_AnimatedCrossView.default, {
+diff --git a/node_modules/react-native-paper-dates/lib/commonjs/Date/Month.js b/node_modules/react-native-paper-dates/lib/commonjs/Date/Month.js
+index f441e3d..6a9c7de 100644
+--- a/node_modules/react-native-paper-dates/lib/commonjs/Date/Month.js
++++ b/node_modules/react-native-paper-dates/lib/commonjs/Date/Month.js
+@@ -223,10 +223,8 @@ function Month(props) {
+         marginTop: monthHeaderSingleMarginTop,
+         marginBottom: monthHeaderSingleMarginBottom
+       } : null],
+-      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactNativePaper.TouchableRipple, {
+-        disabled: !isHorizontal,
+-        onPress: isHorizontal ? () => onPressYear(year) : undefined,
+-        accessibilityRole: "button",
++      children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactNative.View, {
++        accessibilityRole: "header",
+         accessibilityLabel: `${monthName} ${year}`,
+         style: [styles.yearButton, {
+           borderRadius: roundness
+@@ -243,13 +241,6 @@ function Month(props) {
+             }],
+             selectable: false,
+             children: [monthName, " ", year]
+-          }), /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactNative.View, {
+-            style: [styles.iconWrapper, isHorizontal ? _styles.sharedStyles.opacity1 : _styles.sharedStyles.opacity0],
+-            children: /*#__PURE__*/(0, _jsxRuntime.jsx)(_reactNativePaper.Icon, {
+-              size: 24,
+-              color: iconColor,
+-              source: iconSource
+-            })
+           })]
+         })
+       })
+diff --git a/node_modules/react-native-paper-dates/lib/module/Date/DatePickerModal.js b/node_modules/react-native-paper-dates/lib/module/Date/DatePickerModal.js
+index 3ece6c3..773ccea 100644
+--- a/node_modules/react-native-paper-dates/lib/module/Date/DatePickerModal.js
++++ b/node_modules/react-native-paper-dates/lib/module/Date/DatePickerModal.js
+@@ -1,6 +1,7 @@
+ "use strict";
+ 
+ import { Modal, Platform, StyleSheet, TouchableWithoutFeedback, useWindowDimensions, View } from 'react-native';
++import { useSafeAreaInsets } from 'react-native-safe-area-context';
+ import { useTheme } from 'react-native-paper';
+ import DatePickerModalContent from './DatePickerModalContent';
+ import { memo, useCallback, useMemo, useState } from 'react';
+@@ -48,6 +49,7 @@ export function DatePickerModal(props) {
+     height: lastCalendarLayout.height
+   } : undefined, [lastCalendarLayout, windowKey]);
+   const theme = useTheme();
++  const insets = useSafeAreaInsets();
+   const isLargeScreen = useIsLargeScreen();
+   const shouldUseSheet = Platform.OS === 'ios' && (presentationStyle === 'pageSheet' || presentationStyle === 'formSheet');
+   const useFormSheet = shouldUseSheet && isLargeScreen;
+@@ -71,16 +73,16 @@ export function DatePickerModal(props) {
+           }]
+         })
+       }), /*#__PURE__*/_jsx(View, {
+-        style: [StyleSheet.absoluteFill, styles.modalRoot],
++        style: [StyleSheet.absoluteFill, styles.modalRoot, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 16, paddingLeft: insets.left + 16, paddingRight: insets.right + 16 }],
+         pointerEvents: "box-none",
+         children: /*#__PURE__*/_jsx(View, {
+           style: [styles.modalContent, {
+             backgroundColor: theme.colors.elevation.level3
+-          }, isLargeScreen ? useFormSheet ? styles.modalContentFormSheet : styles.modalContentBig : null],
++          }, useFormSheet ? styles.modalContentFormSheet : styles.modalContentBig],
+           children: /*#__PURE__*/_jsx(DatePickerModalContent, {
+             ...rest,
+             inputEnabled: inputEnabled,
+-            disableSafeTop: disableStatusBarPadding,
++            disableSafeTop: true,
+             disableStatusBar: disableStatusBar,
+             statusBarOnTopOfBackdrop: isSheet || statusBarOnTopOfBackdrop,
+             withDateFormatInLabel: props.withDateFormatInLabel,
+@@ -100,8 +102,10 @@ const styles = StyleSheet.create({
+     minHeight: 0
+   },
+   modalContentBig: {
++    flex: 0,
++    height: '85%',
+     maxWidth: 400,
+-    maxHeight: 600,
++    maxHeight: 500,
+     borderRadius: 28,
+     width: '100%',
+     overflow: 'hidden'
+diff --git a/node_modules/react-native-paper-dates/lib/module/Date/DatePickerModalContent.js b/node_modules/react-native-paper-dates/lib/module/Date/DatePickerModalContent.js
+index 4f0f039..fde4c18 100644
+--- a/node_modules/react-native-paper-dates/lib/module/Date/DatePickerModalContent.js
++++ b/node_modules/react-native-paper-dates/lib/module/Date/DatePickerModalContent.js
+@@ -93,14 +93,14 @@ export function DatePickerModalContent(props) {
+       width,
+       height
+     } = event.nativeEvent.layout;
+-    const calendarWidth = width - insets.left - insets.right;
++    const calendarWidth = width;
+     if (onCalendarLayout && calendarWidth > 0 && height > 0) {
+       onCalendarLayout({
+         width: calendarWidth,
+         height
+       });
+     }
+-  }, [onCalendarLayout, insets.left, insets.right]);
++  }, [onCalendarLayout]);
+   return /*#__PURE__*/_jsxs(_Fragment, {
+     children: [/*#__PURE__*/_jsxs(DatePickerModalHeaderBackground, {
+       disableWeekDays: disableWeekDays,
+@@ -117,7 +117,7 @@ export function DatePickerModalContent(props) {
+         uppercase: props.uppercase ?? defaultUppercase,
+         closeIcon: props.closeIcon,
+         disableWeekDays: disableWeekDays
+-      }), /*#__PURE__*/_jsx(DatePickerModalContentHeader, {
++      }), props.allowEditing !== false ? /*#__PURE__*/_jsx(DatePickerModalContentHeader, {
+         state: state,
+         mode: mode,
+         collapsed: collapsed,
+@@ -134,11 +134,10 @@ export function DatePickerModalContent(props) {
+         calendarIcon: props.calendarIcon,
+         allowEditing: props.allowEditing ?? true,
+         disableWeekDays: disableWeekDays
+-      })]
++      }) : null]
+     }), /*#__PURE__*/_jsx(View, {
+       style: [sharedStyles.root, sharedStyles.minHeightZero, {
+-        paddingLeft: insets.left,
+-        paddingRight: insets.right
++        
+       }],
+       onLayout: Platform.OS === 'web' ? undefined : onCalendarContainerLayout,
+       children: /*#__PURE__*/_jsx(AnimatedCrossView, {
+diff --git a/node_modules/react-native-paper-dates/lib/module/Date/Month.js b/node_modules/react-native-paper-dates/lib/module/Date/Month.js
+index e9d3679..03fbeff 100644
+--- a/node_modules/react-native-paper-dates/lib/module/Date/Month.js
++++ b/node_modules/react-native-paper-dates/lib/module/Date/Month.js
+@@ -212,10 +212,8 @@ function Month(props) {
+         marginTop: monthHeaderSingleMarginTop,
+         marginBottom: monthHeaderSingleMarginBottom
+       } : null],
+-      children: /*#__PURE__*/_jsx(TouchableRipple, {
+-        disabled: !isHorizontal,
+-        onPress: isHorizontal ? () => onPressYear(year) : undefined,
+-        accessibilityRole: "button",
++      children: /*#__PURE__*/_jsx(View, {
++        accessibilityRole: "header",
+         accessibilityLabel: `${monthName} ${year}`,
+         style: [styles.yearButton, {
+           borderRadius: roundness
+@@ -232,13 +230,6 @@ function Month(props) {
+             }],
+             selectable: false,
+             children: [monthName, " ", year]
+-          }), /*#__PURE__*/_jsx(View, {
+-            style: [styles.iconWrapper, isHorizontal ? sharedStyles.opacity1 : sharedStyles.opacity0],
+-            children: /*#__PURE__*/_jsx(Icon, {
+-              size: 24,
+-              color: iconColor,
+-              source: iconSource
+-            })
+           })]
+         })
+       })
+diff --git a/node_modules/react-native-paper-dates/src/Date/DatePickerModal.tsx b/node_modules/react-native-paper-dates/src/Date/DatePickerModal.tsx
+index 7355ac7..409957f 100644
+--- a/node_modules/react-native-paper-dates/src/Date/DatePickerModal.tsx
++++ b/node_modules/react-native-paper-dates/src/Date/DatePickerModal.tsx
+@@ -15,6 +15,7 @@ import DatePickerModalContent, {
+ import { memo, useCallback, useMemo, useState } from 'react'
+ import { sharedStyles } from '../shared/styles'
+ import { supportedOrientations, useIsLargeScreen } from '../shared/utils'
++import { useSafeAreaInsets } from 'react-native-safe-area-context'
+ 
+ interface DatePickerModalProps {
+   visible: boolean
+@@ -90,6 +91,7 @@ export function DatePickerModal(
+   )
+ 
+   const theme = useTheme()
++  const insets = useSafeAreaInsets()
+   const isLargeScreen = useIsLargeScreen()
+   const shouldUseSheet =
+     Platform.OS === 'ios' &&
+@@ -124,24 +126,20 @@ export function DatePickerModal(
+           />
+         </TouchableWithoutFeedback>
+         <View
+-          style={[StyleSheet.absoluteFill, styles.modalRoot]}
++          style={[StyleSheet.absoluteFill, styles.modalRoot, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 16, paddingLeft: insets.left + 16, paddingRight: insets.right + 16 }]}
+           pointerEvents="box-none"
+         >
+           <View
+             style={[
+               styles.modalContent,
+               { backgroundColor: theme.colors.elevation.level3 },
+-              isLargeScreen
+-                ? useFormSheet
+-                  ? styles.modalContentFormSheet
+-                  : styles.modalContentBig
+-                : null,
++              useFormSheet ? styles.modalContentFormSheet : styles.modalContentBig,
+             ]}
+           >
+             <DatePickerModalContent
+               {...rest}
+               inputEnabled={inputEnabled}
+-              disableSafeTop={disableStatusBarPadding}
++              disableSafeTop={true}
+               disableStatusBar={disableStatusBar}
+               statusBarOnTopOfBackdrop={isSheet || statusBarOnTopOfBackdrop}
+               withDateFormatInLabel={props.withDateFormatInLabel}
+@@ -163,8 +161,10 @@ const styles = StyleSheet.create({
+     minHeight: 0,
+   },
+   modalContentBig: {
++    flex: 0,
++    height: '85%',
+     maxWidth: 400,
+-    maxHeight: 600,
++    maxHeight: 500,
+     borderRadius: 28,
+     width: '100%',
+     overflow: 'hidden',
+diff --git a/node_modules/react-native-paper-dates/src/Date/DatePickerModalContent.tsx b/node_modules/react-native-paper-dates/src/Date/DatePickerModalContent.tsx
+index 66ffe53..1312bf9 100644
+--- a/node_modules/react-native-paper-dates/src/Date/DatePickerModalContent.tsx
++++ b/node_modules/react-native-paper-dates/src/Date/DatePickerModalContent.tsx
+@@ -18,7 +18,6 @@ import DatePickerModalHeaderBackground from './DatePickerModalHeaderBackground'
+ import DatePickerModalStatusBar from './DatePickerModalStatusBar'
+ import { memo, useCallback, useEffect, useState } from 'react'
+ import { LayoutChangeEvent, Platform, View } from 'react-native'
+-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+ import { sharedStyles } from '../shared/styles'
+ 
+ export type LocalState = {
+@@ -103,7 +102,6 @@ export function DatePickerModalContent(
+   } = props
+   const anyProps = props as any
+   const defaultUppercase = false
+-  const insets = useSafeAreaInsets()
+ 
+   // use local state to add only onConfirm state changes
+   const [state, setState] = useState<LocalState>({
+@@ -158,12 +156,12 @@ export function DatePickerModalContent(
+   const onCalendarContainerLayout = useCallback(
+     (event: LayoutChangeEvent) => {
+       const { width, height } = event.nativeEvent.layout
+-      const calendarWidth = width - insets.left - insets.right
++      const calendarWidth = width
+       if (onCalendarLayout && calendarWidth > 0 && height > 0) {
+         onCalendarLayout({ width: calendarWidth, height })
+       }
+     },
+-    [onCalendarLayout, insets.left, insets.right]
++    [onCalendarLayout]
+   )
+ 
+   return (
+@@ -184,7 +182,7 @@ export function DatePickerModalContent(
+           closeIcon={props.closeIcon}
+           disableWeekDays={disableWeekDays}
+         />
+-        <DatePickerModalContentHeader
++        {props.allowEditing !== false && <DatePickerModalContentHeader
+           state={state}
+           mode={mode}
+           collapsed={collapsed}
+@@ -201,13 +199,12 @@ export function DatePickerModalContent(
+           calendarIcon={props.calendarIcon}
+           allowEditing={props.allowEditing ?? true}
+           disableWeekDays={disableWeekDays}
+-        />
++        />}
+       </DatePickerModalHeaderBackground>
+       <View
+         style={[
+           sharedStyles.root,
+           sharedStyles.minHeightZero,
+-          { paddingLeft: insets.left, paddingRight: insets.right },
+         ]}
+         onLayout={Platform.OS === 'web' ? undefined : onCalendarContainerLayout}
+       >
+diff --git a/node_modules/react-native-paper-dates/src/Date/Month.tsx b/node_modules/react-native-paper-dates/src/Date/Month.tsx
+index b739508..d9c9072 100644
+--- a/node_modules/react-native-paper-dates/src/Date/Month.tsx
++++ b/node_modules/react-native-paper-dates/src/Date/Month.tsx
+@@ -1,5 +1,5 @@
+ import { Platform, ScrollView, StyleSheet, View } from 'react-native'
+-import { Icon, Text, TouchableRipple, useTheme } from 'react-native-paper'
++import { Text, useTheme } from 'react-native-paper'
+ import Day, { EmptyDay } from './Day'
+ 
+ import {
+@@ -82,8 +82,6 @@ function Month(props: MonthSingleProps | MonthRangeProps | MonthMultiProps) {
+     locale,
+     mode,
+     index,
+-    onPressYear,
+-    selectingYear,
+     onPressDate,
+     primaryColor,
+     selectColor,
+@@ -269,10 +267,6 @@ function Month(props: MonthSingleProps | MonthRangeProps | MonthMultiProps) {
+ 
+   const textFont = theme.fonts.titleSmall
+ 
+-  const iconColor = theme.colors.onSurfaceVariant
+-
+-  const iconSource = selectingYear ? 'menu-up' : 'menu-down'
+-
+   const weeks = grid.map(({ weekIndex, generatedDays }) => (
+     <View style={styles.week} key={weekIndex}>
+       {generatedDays
+@@ -333,10 +327,9 @@ function Month(props: MonthSingleProps | MonthRangeProps | MonthMultiProps) {
+             : null,
+         ]}
+       >
+-        <TouchableRipple
+-          disabled={!isHorizontal}
+-          onPress={isHorizontal ? () => onPressYear(year) : undefined}
+-          accessibilityRole="button"
++        {/* Mês e ano identificam o calendário, sem abrir um seletor de anos. */}
++        <View
++          accessibilityRole="header"
+           accessibilityLabel={`${monthName} ${year}`}
+           style={[
+             styles.yearButton,
+@@ -367,16 +360,8 @@ function Month(props: MonthSingleProps | MonthRangeProps | MonthMultiProps) {
+             >
+               {monthName} {year}
+             </Text>
+-            <View
+-              style={[
+-                styles.iconWrapper,
+-                isHorizontal ? sharedStyles.opacity1 : sharedStyles.opacity0,
+-              ]}
+-            >
+-              <Icon size={24} color={iconColor} source={iconSource} />
+-            </View>
+           </View>
+-        </TouchableRipple>
++        </View>
+       </View>
+       {isHorizontal ? (
+         <ScrollView

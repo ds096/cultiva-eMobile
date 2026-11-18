@@ -82,7 +82,7 @@ function readPlan(value: unknown, profileEmail: string): Plan {
 function save(profileEmail: string, plans: Plan[]): void {
   getStorage().set(
     profileKey(profileEmail),
-    JSON.stringify({ schemaVersion: 1, plans }),
+    JSON.stringify({ schemaVersion: 2, plans }),
   );
 }
 
@@ -117,7 +117,7 @@ export const planRepository = {
       throw new Error("JSON dos planos inválido.");
     }
     if (!isRecord(document)) throw new Error("Documento de planos inválido.");
-    if (document.schemaVersion !== 1)
+    if (document.schemaVersion !== 1 && document.schemaVersion !== 2)
       throw new Error("Versão do documento não suportada.");
     if (!Array.isArray(document.plans))
       throw new Error("Lista de planos inválida.");
@@ -127,6 +127,14 @@ export const planRepository = {
     // IDs duplicados tornariam edição e exclusão ambíguas.
     if (new Set(plans.map((plan) => plan.id)).size !== plans.length) {
       throw new Error("IDs de planos duplicados.");
+    }
+    // Só substitui o documento antigo após validar todos os planos e atividades.
+    if (document.schemaVersion === 1) {
+      try {
+        save(email, plans);
+      } catch {
+        throw new Error("Não foi possível migrar as datas dos planos.");
+      }
     }
     return plans;
   },

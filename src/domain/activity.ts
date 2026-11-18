@@ -56,11 +56,11 @@ export function normalizeActivityCategory(
   return match;
 }
 
-// Valida uma data de calendário sem convertê-la em instante ou aplicar fuso horário.
+// Aceita o formato antigo e o UTC canônico, preservando o dia de calendário.
 export function validatePlannedStartDate(value?: string): string | undefined {
   const date = normalizeOptionalText(value);
   if (date === undefined) return undefined;
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  const match = /^(\d{4})-(\d{2})-(\d{2})(?:T00:00:00\.000Z)?$/.exec(date);
   if (!match) throw new Error("Informe uma data válida no formato AAAA-MM-DD.");
   const year = Number(match[1]);
   const month = Number(match[2]);
@@ -77,7 +77,7 @@ export function validatePlannedStartDate(value?: string): string | undefined {
   ) {
     throw new Error("Informe uma data válida no formato AAAA-MM-DD.");
   }
-  return date;
+  return `${match[1]}-${match[2]}-${match[3]}T00:00:00.000Z`;
 }
 
 // A duração ausente é aceita; quando informada, deve ser um inteiro seguro positivo.
@@ -100,7 +100,7 @@ export function calculatePlannedEndDate(
   const start = validatePlannedStartDate(startDate);
   const duration = validateEstimatedDurationDays(durationDays);
   if (start === undefined || duration === undefined) return undefined;
-  const [year, month, day] = start.split("-").map(Number);
+  const [year, month, day] = start.slice(0, 10).split("-").map(Number);
   const date = new Date(0);
   date.setUTCFullYear(year, month - 1, day);
   date.setUTCDate(date.getUTCDate() + duration);
