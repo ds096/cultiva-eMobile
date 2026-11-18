@@ -29,10 +29,10 @@ import {
   type PlanActivityInput,
 } from "../domain/activity";
 import {
-  PlotFormButton,
-  PlotFormField,
-  type PlotFormInput,
-} from "../components/PlotFormControls";
+  FormButton,
+  FormField,
+  type FormInput,
+} from "../components/FormControls";
 import { theme, tokens } from "../theme/theme";
 
 const emptyActivity = {
@@ -74,12 +74,11 @@ export default function CreatePlanScreen() {
   const saveLock = useRef(false);
   const nextActivityId = useRef(0);
   const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
-  const descriptionRef = useRef<PlotFormInput>(null);
-  const activityNameRef = useRef<PlotFormInput>(null);
-  const hasPendingActivity = Object.entries(activity).some(([key, value]) =>
-    key === "notify"
-      ? value === true
-      : typeof value === "string" && value.trim() !== "",
+  const descriptionRef = useRef<FormInput>(null);
+  const activityNameRef = useRef<FormInput>(null);
+  // Detecta campos preenchidos para evitar perder uma atividade não adicionada.
+  const hasPendingActivity = Object.values(activity).some((value) =>
+    typeof value === "string" ? value.trim() !== "" : value,
   );
   const dirty = Boolean(
     name || description || activities.length || hasPendingActivity,
@@ -264,7 +263,7 @@ export default function CreatePlanScreen() {
                   Identificação do plano
                 </Text>
               </View>
-              <PlotFormField
+              <FormField
                 id="plan-name"
                 label="Nome"
                 value={name}
@@ -279,7 +278,7 @@ export default function CreatePlanScreen() {
                 submitBehavior="submit"
                 onSubmitEditing={() => descriptionRef.current?.focus()}
               />
-              <PlotFormField
+              <FormField
                 id="plan-description"
                 inputRef={descriptionRef}
                 label="Descrição"
@@ -307,7 +306,7 @@ export default function CreatePlanScreen() {
                   Atividades do plano
                 </Text>
               </View>
-              <PlotFormField
+              <FormField
                 id="activity-name"
                 inputRef={activityNameRef}
                 label="Nome da atividade"
@@ -382,12 +381,7 @@ export default function CreatePlanScreen() {
                             checked: activity.category === category,
                           }}
                           onPress={() => {
-                            updateActivity(
-                              "category",
-                              ACTIVITY_CATEGORIES.find(
-                                (item) => item === category,
-                              ) ?? "",
-                            );
+                            updateActivity("category", category);
                             setCategoryOpen(false);
                           }}
                         >
@@ -410,7 +404,7 @@ export default function CreatePlanScreen() {
                   </View>
                 </SafeAreaView>
               </Modal>
-              <PlotFormField
+              <FormField
                 id="activity-start"
                 label="Data inicial"
                 hint="Formato DD/MM/AAAA, por exemplo 10/11/2026."
@@ -420,7 +414,7 @@ export default function CreatePlanScreen() {
                 error={activityErrors.startDate}
                 editable={!saving}
               />
-              <PlotFormField
+              <FormField
                 id="activity-duration"
                 label="Duração em dias"
                 keyboardType="number-pad"
@@ -429,7 +423,7 @@ export default function CreatePlanScreen() {
                 error={activityErrors.duration}
                 editable={!saving}
               />
-              <PlotFormField
+              <FormField
                 id="activity-notes"
                 label="Observações"
                 value={activity.notes}
@@ -447,7 +441,7 @@ export default function CreatePlanScreen() {
                   accessibilityLabel="Solicitar lembrete para esta atividade"
                 />
               </View>
-              <PlotFormButton
+              <FormButton
                 label="Adicionar atividade"
                 variant="secondary"
                 onPress={handleAddActivity}
@@ -464,9 +458,6 @@ export default function CreatePlanScreen() {
                 return (
                   <View key={item.id} style={styles.activityCard}>
                     <Text variant="titleMedium">{item.input.name}</Text>
-                    {item.input.description ? (
-                      <Text variant="bodyLarge">{item.input.description}</Text>
-                    ) : null}
                     {item.input.category ? (
                       <Text variant="bodyMedium">{item.input.category}</Text>
                     ) : null}
@@ -488,7 +479,7 @@ export default function CreatePlanScreen() {
                     {item.input.notes ? (
                       <Text variant="bodyLarge">{item.input.notes}</Text>
                     ) : null}
-                    <PlotFormButton
+                    <FormButton
                       label="Remover atividade"
                       accessibilityLabel={`Remover atividade ${item.input.name}`}
                       variant="remove"
@@ -499,7 +490,7 @@ export default function CreatePlanScreen() {
                 );
               })}
             </View>
-            <PlotFormButton
+            <FormButton
               label={saving ? "Salvando plano..." : "Salvar plano"}
               onPress={handleSavePlan}
               disabled={saving}

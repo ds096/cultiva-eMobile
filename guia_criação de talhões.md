@@ -2,7 +2,7 @@
 
 Atualizado em 11/11/2026. Material de aprendizagem baseado nos arquivos presentes nesta data.
 
-Este guia explica como [PlotFormControls.tsx](src/components/PlotFormControls.tsx) apresenta os controles e como [createPlot.tsx](src/app/createPlot.tsx) coordena o cadastro. Leia o código junto do texto, uma função por vez.
+Este guia explica como [FormControls.tsx](src/components/FormControls.tsx) apresenta os controles e como [createPlot.tsx](src/app/createPlot.tsx) coordena o cadastro. Leia o código junto do texto, uma função por vez.
 
 ## 1. O caminho dos dados
 
@@ -10,7 +10,7 @@ O produtor preenche os campos, adiciona culturas à lista e aciona **Salvar talh
 
 | Arquivo | Responsabilidade |
 | --- | --- |
-| `src/components/PlotFormControls.tsx` | Aparência, interação e acessibilidade dos campos e botões. |
+| `src/components/FormControls.tsx` | Aparência, interação e acessibilidade dos campos e botões. |
 | `src/app/createPlot.tsx` | Estado do formulário, eventos, validação para orientar o preenchimento e solicitação de salvamento. |
 | `src/domain/plot.ts` | Tipos e regras dos dados do talhão e das culturas. |
 | `src/repositories/plotRepository.ts` | Identificação do perfil, leitura e gravação local no MMKV. |
@@ -21,11 +21,11 @@ Os controles recebem informações da tela por **props**, que são parâmetros d
 
 O perfil é uma seleção local por e-mail, sem comprovação de identidade. Separar documentos por perfil não equivale a autenticação nem a autorização em um servidor.
 
-## 2. O que existe no arquivo PlotFormControls
+## 2. O que existe no arquivo FormControls
 
-Apesar do nome do arquivo, não existe um componente único chamado `PlotFormControls`. Ele exporta três componentes e um tipo: `PlotFormField`, `PlotFormButton`, `PlotRemoveButton` e `PlotFormInput`.
+Apesar do nome do arquivo, não existe um componente único chamado `FormControls`. Ele exporta três componentes e um tipo: `FormField`, `FormButton`, `PlotRemoveButton` e `FormInput`.
 
-### PlotFormField: um campo com rótulo e orientação
+### FormField: um campo com rótulo e orientação
 
 O componente reúne o rótulo visível, um `TextInput` do React Native Paper e uma mensagem auxiliar ou de erro abaixo dele. Isso evita repetir a mesma estrutura em cada campo da tela.
 
@@ -53,15 +53,15 @@ O campo é **controlado**: seu texto vem de `value`. Ao digitar, `onChangeText` 
 
 A aparência usa contorno, tokens do tema e fonte de corpo. A altura considera a escala de fonte do sistema, com um mínimo de 56 unidades. O rótulo permanece acima do valor, inclusive quando o campo está vazio. Erros recebem estilo próprio e recursos de anúncio para o leitor de tela.
 
-### PlotFormInput: uma referência para foco
+### FormInput: uma referência para foco
 
-O tipo `PlotFormInput` expõe somente `focus()`. A referência não guarda o texto digitado: ela permite realizar uma ação sobre o campo que está na tela.
+O tipo `FormInput` expõe somente `focus()`. A referência não guarda o texto digitado: ela permite realizar uma ação sobre o campo que está na tela.
 
 O callback de `ref` recebe a instância fornecida pelo Paper, confere se existe um método `focus` e cria uma pequena interface para a tela usá-lo. A verificação trata o valor como desconhecido antes de acessar sua função. Ao remover a instância, a referência volta a `null`.
 
 Na tela, `areaRef.current?.focus()` significa: se a referência da área estiver disponível, coloque o foco nela. O operador `?.` evita chamar um método quando `current` ainda é `null`.
 
-### PlotFormButton: uma ação com texto
+### FormButton: uma ação com texto
 
 Esse componente usa `TouchableRipple` do Paper, `Text` e, durante carregamento, `ActivityIndicator`. Foi composto dessa forma para permitir quebra de linha no rótulo e crescimento vertical com a fonte do sistema.
 

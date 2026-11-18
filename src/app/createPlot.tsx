@@ -22,11 +22,11 @@ import {
   validateCrop,
 } from "../domain/plot";
 import {
-  PlotFormButton,
-  PlotFormField,
+  FormButton,
+  FormField,
   PlotRemoveButton,
-  type PlotFormInput,
-} from "../components/PlotFormControls";
+  type FormInput,
+} from "../components/FormControls";
 import { theme, tokens } from "../theme/theme";
 
 type FormCrop = Crop & { id: string };
@@ -56,10 +56,10 @@ export default function CreatePlotScreen() {
   const nextCropId = useRef(0);
   const saveLock = useRef(false);
   // Cada referência permite levar o foco ao campo seguinte sem fechar o teclado.
-  const areaRef = useRef<PlotFormInput>(null);
-  const yearRef = useRef<PlotFormInput>(null);
-  const cropNameRef = useRef<PlotFormInput>(null);
-  const cropQuantityRef = useRef<PlotFormInput>(null);
+  const areaRef = useRef<FormInput>(null);
+  const yearRef = useRef<FormInput>(null);
+  const cropNameRef = useRef<FormInput>(null);
+  const cropQuantityRef = useRef<FormInput>(null);
 
   useEffect(() => {
     if (!feedback) return;
@@ -260,7 +260,7 @@ export default function CreatePlotScreen() {
                   Identificação do talhão
                 </Text>
               </View>
-              <PlotFormField
+              <FormField
                 id="plot-name"
                 // Confirmação envia o evento sem desfocar antes do próximo campo.
                 returnKeyType="next"
@@ -272,7 +272,7 @@ export default function CreatePlotScreen() {
                 error={errors.name}
                 editable={!saving}
               />
-              <PlotFormField
+              <FormField
                 id="plot-area"
                 inputRef={areaRef}
                 returnKeyType="next"
@@ -285,7 +285,7 @@ export default function CreatePlotScreen() {
                 error={errors.area}
                 editable={!saving}
               />
-              <PlotFormField
+              <FormField
                 id="plot-year"
                 inputRef={yearRef}
                 returnKeyType="next"
@@ -316,7 +316,7 @@ export default function CreatePlotScreen() {
                 </Text>
               </View>
 
-              <PlotFormField
+              <FormField
                 id="crop-name"
                 inputRef={cropNameRef}
                 returnKeyType="next"
@@ -328,7 +328,7 @@ export default function CreatePlotScreen() {
                 error={errors.cropName}
                 editable={!saving}
               />
-              <PlotFormField
+              <FormField
                 id="crop-quantity"
                 inputRef={cropQuantityRef}
                 returnKeyType="done"
@@ -346,7 +346,7 @@ export default function CreatePlotScreen() {
                 error={errors.cropQuantity}
                 editable={!saving}
               />
-              <PlotFormButton
+              <FormButton
                 label="Adicionar cultura"
                 variant="secondary"
                 onPress={handleAddCrop}
@@ -392,7 +392,7 @@ export default function CreatePlotScreen() {
             </View>
 
             <View style={styles.footer}>
-              <PlotFormButton
+              <FormButton
                 label={saving ? "Salvando talhão…" : "Salvar talhão"}
                 onPress={handleSavePlot}
                 disabled={saving}

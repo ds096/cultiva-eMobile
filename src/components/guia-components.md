@@ -9,12 +9,12 @@ Este guia descreve os componentes próprios de `src/components` e seus usos no c
 | `AppDrawerContent` | [AppDrawerContent.tsx](AppDrawerContent.tsx) | [Layout do Drawer](../app/(drawer)/_layout.tsx) |
 | `PlotCard` | [PlotCard.tsx](PlotCard.tsx) | [Lista de talhões](../app/(drawer)/plots.tsx) |
 | `PlotCreatedFeedback` | [PlotCreatedFeedback.tsx](PlotCreatedFeedback.tsx) | [Tela de planos](../app/(drawer)/plans.tsx) |
-| `PlotFormField` | [PlotFormControls.tsx](PlotFormControls.tsx) | [Cadastro de talhão](../app/createPlot.tsx) |
-| `PlotFormButton` | [PlotFormControls.tsx](PlotFormControls.tsx) | [Cadastro de talhão](../app/createPlot.tsx) |
-| `PlotRemoveButton` | [PlotFormControls.tsx](PlotFormControls.tsx) | [Cadastro de talhão](../app/createPlot.tsx) |
+| `FormField` | [FormControls.tsx](FormControls.tsx) | [Cadastro de talhão](../app/createPlot.tsx) e [de plano](../app/createPlan.tsx) |
+| `FormButton` | [FormControls.tsx](FormControls.tsx) | [Cadastro de talhão](../app/createPlot.tsx) e [de plano](../app/createPlan.tsx) |
+| `PlotRemoveButton` | [FormControls.tsx](FormControls.tsx) | [Cadastro de talhão](../app/createPlot.tsx) |
 | `ProfileLanding` | [ProfileLanding.tsx](ProfileLanding.tsx) | [Tela inicial](../app/index.tsx) |
 
-`AppDrawerContent`, `PlotCreatedFeedback` e `ProfileLanding` são exportações padrão: são importados sem chaves. `PlotCard` e os três controles de `PlotFormControls` são exportações nomeadas e usam chaves no import.
+`AppDrawerContent`, `PlotCreatedFeedback` e `ProfileLanding` são exportações padrão: são importados sem chaves. `PlotCard` e os três controles de `FormControls` são exportações nomeadas e usam chaves no import.
 
 ## AppDrawerContent
 
@@ -63,11 +63,11 @@ renderItem={({ item }) => (
 
 **Fluxo:** após criar o primeiro talhão, `createPlot.tsx` navega para `/plans` com `plotCreated: "true"`. A tela de planos renderiza `<PlotCreatedFeedback />`. Nos cadastros seguintes, o destino é `/plots` sem esse parâmetro. A tela de planos ainda apresenta conteúdo em desenvolvimento.
 
-## PlotFormControls
+## FormControls
 
 O arquivo reúne controles visuais do cadastro de talhão. Eles utilizam o tema compartilhado em [theme.ts](../theme/theme.ts); os dados e as ações continuam nas mãos da tela.
 
-### PlotFormField
+### FormField
 
 **Função:** apresenta um campo de texto com rótulo sempre visível, orientação ou erro. O campo cresce conforme a escala de fonte do sistema e associa o rótulo ao input para acessibilidade.
 
@@ -77,13 +77,13 @@ O arquivo reúne controles visuais do cadastro de talhão. Eles utilizam o tema 
 - `value` e `onChangeText`: valor exibido e função chamada quando o usuário digita. A tela mantém o estado.
 - `hint` e `error`: orientação e erro; quando há erro, ele tem prioridade sobre a orientação.
 - `keyboardType`, `placeholder`, `editable`, `returnKeyType`, `submitBehavior` e `onSubmitEditing`: opções encaminhadas ao `TextInput` do Paper.
-- `inputRef`: referência opcional que expõe apenas `focus()`, usando o tipo `PlotFormInput`.
+- `inputRef`: referência opcional que expõe apenas `focus()`, usando o tipo `FormInput`.
 
 Em `createPlot.tsx`, há campos para nome, área, ano, nome da cultura e quantidade. A tela fornece referências e ações para avançar pelo teclado. No último campo, a confirmação tenta adicionar a cultura; salvar o talhão continua sendo uma ação separada.
 
 ```tsx
 // Exemplo simplificado: a tela mantém nome e setNome no estado.
-<PlotFormField
+<FormField
   id="plot-name"
   label="Nome"
   value={nome}
@@ -92,7 +92,7 @@ Em `createPlot.tsx`, há campos para nome, área, ano, nome da cultura e quantid
 />
 ```
 
-### PlotFormButton
+### FormButton
 
 **Função:** apresenta um botão com efeito de toque e rótulo que pode ocupar mais de uma linha.
 
@@ -125,4 +125,4 @@ Essa seleção por e-mail é local e não comprova identidade. O componente cons
 
 ## Como conferir e manter este guia
 
-Ao criar, remover ou alterar um componente, confira suas props, estados e chamadas em `src` e atualize o mapa e a seção correspondente. Por exemplo, `rg -n 'PlotFormField' src` encontra a declaração e seus usos. Examine também a tela chamadora: o nome de uma prop não explica sozinho o que a ação faz. Componentes de bibliotecas como React Native Paper aparecem dentro destes arquivos, mas não são componentes próprios catalogados neste guia.
+Ao criar, remover ou alterar um componente, confira suas props, estados e chamadas em `src` e atualize o mapa e a seção correspondente. Por exemplo, `rg -n 'FormField' src` encontra a declaração e seus usos. Examine também a tela chamadora: o nome de uma prop não explica sozinho o que a ação faz. Componentes de bibliotecas como React Native Paper aparecem dentro destes arquivos, mas não são componentes próprios catalogados neste guia.

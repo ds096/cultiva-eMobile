@@ -21,7 +21,7 @@ type FieldProps = Pick<
   | "submitBehavior"
   | "onSubmitEditing"
 > & {
-  inputRef?: RefObject<PlotFormInput | null>;
+  inputRef?: RefObject<FormInput | null>;
   id: string;
   label: string;
   hint?: string;
@@ -29,10 +29,10 @@ type FieldProps = Pick<
 };
 
 // Expõe somente a instância do campo Paper para permitir focus() entre campos.
-export type PlotFormInput = { focus: () => void };
+export type FormInput = { focus: () => void };
 
 // Mantém o rótulo acima do campo, mesmo vazio, sem depender do placeholder.
-export function PlotFormField({
+export function FormField({
   id,
   label,
   hint,
@@ -131,7 +131,7 @@ export function PlotRemoveButton({
 
 // O ripple do Paper permite texto sem limite de linhas e alvo mínimo de 52.
 // Button do Paper limita seu rótulo interno a uma linha na versão instalada.
-export function PlotFormButton({
+export function FormButton({
   label,
   onPress,
   variant = "primary",
